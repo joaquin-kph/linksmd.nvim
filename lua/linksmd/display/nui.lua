@@ -2,7 +2,6 @@ local Popup = require('nui.popup')
 local Layout = require('nui.layout')
 local Menu = require('nui.menu')
 local Tree = require('nui.tree')
-local Input = require('nui.input')
 local event = require('nui.utils.autocmd').event
 local utils = require('linksmd.utils')
 local plenary_async = require('plenary.async')
@@ -25,26 +24,6 @@ local function nui_tree(bufnr)
   return Tree({
     bufnr = bufnr,
     nodes = {},
-  })
-end
-
-local function nui_input()
-  return Input({
-    border = {
-      style = 'single',
-      text = {
-        top = 'INPUT',
-        top_align = 'left',
-      },
-    },
-  }, {
-    prompt = '> ',
-    on_change = function(value)
-      print(value)
-    end,
-    on_submit = function(value)
-      print('BYE')
-    end
   })
 end
 
@@ -103,7 +82,56 @@ local function nui_menu(title, items, bufnr_preview, root_dir)
   })
 end
 
-local function node_tree(nodes)
+local function node_tree_follow(tree, follow_dir, final_tree)
+  if #follow_dir == 0 then
+    return final_tree
+  end
+
+  for i, v in ipairs(tree) do
+    if v.text == follow_dir[1] then
+      table.remove(follow_dir, 1)
+
+      table.insert(_G.linksmd.nui.tree.parent_files, tree)
+      _G.linksmd.nui.tree.level = _G.linksmd.nui.tree.level + 1
+      table.insert(_G.linksmd.nui.tree.breadcrumb, v.text)
+
+      if tree[i].children then
+        final_tree = node_tree_follow(tree[i].children, follow_dir, tree[i].children)
+      end
+      break
+    end
+  end
+
+  return final_tree
+end
+
+local function node_tree(nodes, tree)
+  local item_pos = 1
+
+  for i, v in ipairs(nodes) do
+    if #v == 0 then
+      local child_tree = nil
+
+      if nodes[i + 1] and #nodes[i + 1] > 0 then
+        child_tree = node_tree(nodes[i + 1], {})
+      end
+
+      if child_tree ~= nil then
+        -- table.insert(tree, { DIR = v.text, children = child_tree })
+        table.insert(tree, Tree.Node({ text = v.text, file = v.file, children = child_tree, item_pos = item_pos }))
+      else
+        -- table.insert(tree, { FILE = v.text })
+        table.insert(tree, Tree.Node({ text = v.text, file = v.file, item_pos = item_pos }))
+      end
+
+      item_pos = item_pos + 1
+    end
+  end
+
+  return tree
+end
+
+local function node_tree2(nodes)
   local tree = {}
 
   local item_pos = 1
@@ -159,46 +187,36 @@ local function node_files(file, parts, node, aux_ids)
 end
 
 -- DEPRECATED: Esta función fue reemplazada por node_files
-local function node_files_v1(file, parts, node)
-  local first_part = parts[1]
+-- local function node_files_v1(file, parts, node)
+--   local first_part = parts[1]
 
-  table.remove(parts, 1)
+--   table.remove(parts, 1)
 
-  if #parts == 0 then
-    table.insert(node, first_part)
-  else
-    if not node[first_part] then
-      node[first_part] = {}
-    end
+--   if #parts == 0 then
+--     table.insert(node, first_part)
+--   else
+--     if not node[first_part] then
+--       node[first_part] = {}
+--     end
 
-    local child_node = node[first_part]
+--     local child_node = node[first_part]
 
-    while #parts > 0 do
-      if #parts == 1 then
-        table.insert(child_node, parts[1])
-      else
-        if not child_node[parts[1]] then
-          child_node[parts[1]] = {}
-        end
-      end
+--     while #parts > 0 do
+--       if #parts == 1 then
+--         table.insert(child_node, parts[1])
+--       else
+--         if not child_node[parts[1]] then
+--           child_node[parts[1]] = {}
+--         end
+--       end
 
-      child_node = child_node[parts[1]]
-      table.remove(parts, 1)
-    end
-  end
+--       child_node = child_node[parts[1]]
+--       table.remove(parts, 1)
+--     end
+--   end
 
-  return node
-end
-
-local function load_nodes_tree(files)
-  local nodes = {}
-
-  for i, file in ipairs(files) do
-    table.insert(nodes, Tree.Node({ text = file, table_id = i }))
-  end
-
-  return nodes
-end
+--   return node
+-- end
 
 local function preview_data(bufnr_preview, root_dir, item)
   local path = string.format('%s/%s', root_dir, item)
@@ -222,7 +240,9 @@ end
 local DisplayNui = {}
 DisplayNui.__index = DisplayNui
 
-function DisplayNui:init(opts, root_dir)
+function DisplayNui:init(opts, root_dir, follow_dir)
+  follow_dir = string.gsub(follow_dir, '^' .. root_dir .. '/', '')
+
   local data = {
     root_dir = root_dir,
     opts = opts,
@@ -230,6 +250,7 @@ function DisplayNui:init(opts, root_dir)
       state = true,
     },
     files = nil,
+    follow_dir = follow_dir,
   }
 
   local valid_filter = false
@@ -348,8 +369,9 @@ function DisplayNui:mapping_tree(layout, popup_preview, popup_tree, tree)
     table.insert(_G.linksmd.nui.tree.breadcrumb, node.text)
 
     if node.children then
-      local tree_nodes = node_tree(node.children)
-      tree:set_nodes(tree_nodes)
+      -- local tree_nodes = node_tree(node.children)
+      -- tree:set_nodes(tree_nodes)
+      tree:set_nodes(node.children)
       tree:render()
 
       popup_tree.border:set_text(
@@ -387,12 +409,9 @@ function DisplayNui:launch()
     return
   end
 
-  local tree = node_tree(nodes)
-
   local popup_preview = nui_popup(false, false, self.opts.text.preview)
   local popup_tree = nui_popup(true, true, self.opts.text.menu)
   local menu_tree = nui_tree(popup_tree.bufnr)
-  local input_file = nui_input()
 
   popup_tree.border:set_text('bottom', string.format(' Notebook: %s ', self.opts.notebook_main), 'right')
 
@@ -405,22 +424,34 @@ function DisplayNui:launch()
       },
     },
     Layout.Box({
-      Layout.Box(popup_preview, { size = '60%' }),
+      -- Layout.Box(popup_preview, { size = '60%' }),
       Layout.Box(popup_tree, { size = '40%' }),
+      -- Layout.Box(input_file, { size = '20%' }),
     }, { dir = 'col' })
   )
 
-  menu_tree:set_nodes(tree)
+  -- local tree2 = node_tree2(nodes)
+  local tree = node_tree(nodes, {})
+  if self.follow_dir ~= nil then
+    local tree2 = node_tree_follow(tree, vim.split(self.follow_dir, '/'))
+
+    popup_tree.border:set_text(
+      'top',
+      string.format(' %s -> %s ', self.opts.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
+      'left'
+    )
+
+    -- print(#_G.linksmd.nui.tree.parent_files)
+    -- print(vim.inspect(_G.linksmd.nui.tree.parent_files[1]))
+    -- print(vim.inspect(tree))
+    -- menu_tree:set_nodes(_G.linksmd.nui.tree.parent_files[1])
+    menu_tree:set_nodes(tree2)
+  end
 
   layout:mount()
-  -- input_file:mount()
   menu_tree:render()
 
   self:mapping_tree(layout, popup_preview, popup_tree, menu_tree)
-
-  input_file:on(event.BufLeave, function()
-    input_file:unmount()
-  end)
 
   popup_tree:on(event.BufLeave, function()
     popup_preview:unmount()
