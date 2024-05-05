@@ -60,7 +60,7 @@ M.display = function(directory)
   end
 
   if M.opts.display == 'nui' then
-    DisplayNui:init(M.opts, root_dir, directory):launch()
+    DisplayNui:init(M.opts, root_dir, directory, false):launch()
   elseif M.opts.display == 'telescope' then
     print('USAR TELESCOPE')
   else
@@ -69,6 +69,7 @@ M.display = function(directory)
 end
 
 M.setup({ display = 'nui' })
-M.display('/home/hakyn/test/vault/notas/codigo/web')
+-- M.display('/home/hakyn/test/vault/notas/codigo/web')
+M.display()
 
 return M

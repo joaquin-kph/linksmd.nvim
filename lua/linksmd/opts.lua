@@ -21,5 +21,6 @@ return {
     scroll_preview = '<M-p>',
     scroll_preview_down = '<M-d>',
     scroll_preview_up = '<M-u>',
+    search_file = '<M-f>',
   },
 }

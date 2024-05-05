@@ -15,14 +15,14 @@ M.get_root_dir = function()
   return mkdnflow.root_dir
 end
 
-M.get_files = function(root_dir, extensions, hidden)
+M.get_files = function(root_dir, extensions, hidden, only_dirs)
   local files = {
     all = {},
     filtered = {},
   }
 
-  local scandir = plenary_scandir(root_dir, { hidden = hidden })
-
+  local scandir = plenary_scandir(root_dir, { hidden = hidden, only_dirs = true })
+  print(vim.inspect(scandir))
   for i = #scandir, 1, -1 do
     table.insert(files.all, scandir[i])
   end
