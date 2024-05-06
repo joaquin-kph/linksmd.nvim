@@ -1,7 +1,7 @@
 local Layout = require('nui.layout')
 local plenary_async = require('plenary.async')
-local utils = require('linksmd.utils')
-local DisplayTelescope = require('linksmd.display.telescope')
+local ufiles = require('linksmd.utils.files')
+local DisplayTelescope = require('linksmd.finder')
 
 local M = {}
 
@@ -13,7 +13,7 @@ local function preview_data(bufnr_preview, root_dir, item)
   local path = string.format('%s/%s', root_dir, item)
 
   plenary_async.run(function()
-    local data = utils.read_file(path)
+    local data = ufiles.read_file(path)
     local text = vim.split(data and data or '', '\n')
 
     vim.schedule(function()
@@ -197,6 +197,12 @@ M.search_dir = function(display, popup_tree)
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
     DisplayTelescope:init(display.opts, display.root_dir, display.files, true):launch()
+  end)
+end
+
+M.change_searching = function(display, popup_tree)
+  popup_tree:map('n', display.opts.keymaps.change_searching, function()
+    print('CAMBIAR SEARCHING')
   end)
 end
 

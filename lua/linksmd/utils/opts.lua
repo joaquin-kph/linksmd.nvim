@@ -23,5 +23,6 @@ return {
     scroll_preview_up = '<M-u>',
     search_file = '<M-f>',
     search_dir = '<M-d>',
+    change_searching = '<M-s>',
   },
 }

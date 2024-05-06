@@ -1,6 +1,5 @@
-local default_opts = require('linksmd.opts')
-local DisplayNui = require('linksmd.display.nui')
-local utils = require('linksmd.utils')
+local default_opts = require('linksmd.utils.opts')
+local ufiles = require('linksmd.utils.files')
 local plenary_path = require('plenary.path')
 
 local M = {}
@@ -41,7 +40,7 @@ M.display = function(directory)
 
     root_dir = M.opts.notebook_main
   else
-    root_dir = utils.get_root_dir()
+    root_dir = ufiles.get_root_dir()
   end
 
   if directory ~= nil then
@@ -60,7 +59,7 @@ M.display = function(directory)
   end
 
   if M.opts.display == 'nui' then
-    DisplayNui:init(M.opts, root_dir, directory, {}, true):launch()
+    require('linksmd.manager'):init(M.opts, root_dir, directory, {}, true):launch()
   elseif M.opts.display == 'telescope' then
     print('USAR TELESCOPE')
   else

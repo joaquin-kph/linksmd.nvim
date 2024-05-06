@@ -3,7 +3,7 @@ local finders = require('telescope.finders')
 local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
-local utils = require('linksmd.utils')
+local ufiles = require('linksmd.utils.files')
 
 local DisplayTelescope = {}
 DisplayTelescope.__index = DisplayTelescope
@@ -31,7 +31,7 @@ function DisplayTelescope:init(opts, root_dir, files, only_dirs)
       return
     end
 
-    data.files = utils.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
   else
     data.files = files
   end
@@ -69,7 +69,7 @@ function DisplayTelescope:launch()
           local selection = action_state.get_selected_entry()[1]
 
           if self.only_dirs then
-            require('linksmd.display.nui'):init(self.opts, self.root_dir, selection, self.files, false):launch()
+            require('linksmd.manager'):init(self.opts, self.root_dir, selection, self.files, false):launch()
           else
             print(selection)
           end

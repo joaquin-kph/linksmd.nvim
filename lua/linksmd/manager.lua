@@ -1,9 +1,9 @@
 local Layout = require('nui.layout')
 local event = require('nui.utils.autocmd').event
-local utils = require('linksmd.utils')
-local components = require('linksmd.display.components')
-local tools = require('linksmd.display.tools')
-local mappings = require('linksmd.display.mappings')
+local ufiles = require('linksmd.utils.files')
+local components = require('linksmd.utils.components')
+local node = require('linksmd.utils.node')
+local mappings = require('linksmd.utils.mappings')
 
 local DisplayNui = {}
 DisplayNui.__index = DisplayNui
@@ -38,7 +38,7 @@ function DisplayNui:init(opts, root_dir, follow_dir, files, only_dirs)
       return
     end
 
-    data.files = utils.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
   else
     data.files = files
   end
@@ -55,7 +55,7 @@ function DisplayNui:launch()
   for _, file in ipairs(self.files.files) do
     local parts = vim.split(file, '/')
 
-    nodes = tools.node_files(file, parts, nodes, node_ids)
+    nodes = node.node_files(file, parts, nodes, node_ids)
   end
 
   if #nodes == 0 then
@@ -88,9 +88,9 @@ function DisplayNui:launch()
   )
 
   -- local tree2 = node_tree2(nodes)
-  local tree = tools.node_tree(nodes, {})
+  local tree = node.node_tree(nodes, {})
   if self.follow_dir ~= nil then
-    tree = tools.node_tree_follow(tree, vim.split(self.follow_dir, '/'))
+    tree = node.node_tree_follow(tree, vim.split(self.follow_dir, '/'))
 
     popup_tree.border:set_text(
       'top',
@@ -113,6 +113,7 @@ function DisplayNui:launch()
   mappings.scroll_down(self, popup_tree, popup_preview)
   mappings.search_file(self, popup_tree)
   mappings.search_dir(self, popup_tree)
+  mappings.change_searching(self, popup_tree)
 
   popup_tree:on(event.BufLeave, function()
     popup_preview:unmount()

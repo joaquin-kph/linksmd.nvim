@@ -1,6 +1,8 @@
 local Popup = require('nui.popup')
 local Menu = require('nui.menu')
 local Tree = require('nui.tree')
+local plenary_async = require('plenary.async')
+local ufiles = require('linksmd.utils.files')
 
 local M = {}
 
@@ -53,7 +55,7 @@ M.menu = function(title, items, bufnr_preview, root_dir)
       local path = string.format('%s/%s', root_dir, item.text)
 
       plenary_async.run(function()
-        local data = utils.read_file(path)
+        local data = ufiles.read_file(path)
         local text = vim.split(data and data or '', '\n')
 
         vim.schedule(function()
