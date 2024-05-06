@@ -8,7 +8,7 @@ local mappings = require('linksmd.display.mappings')
 local DisplayNui = {}
 DisplayNui.__index = DisplayNui
 
-function DisplayNui:init(opts, root_dir, follow_dir, only_dirs)
+function DisplayNui:init(opts, root_dir, follow_dir, files, only_dirs)
   if follow_dir ~= nil then
     follow_dir = string.gsub(follow_dir, '^' .. root_dir .. '/', '')
   end
@@ -23,21 +23,25 @@ function DisplayNui:init(opts, root_dir, follow_dir, only_dirs)
     follow_dir = follow_dir,
   }
 
-  local valid_filter = false
+  if not files.files or #files.files == 0 then
+    local valid_filter = false
 
-  for s, _ in pairs(data.opts.filters) do
-    if s == data.opts.searching then
-      valid_filter = true
-      break
+    for s, _ in pairs(data.opts.filters) do
+      if s == data.opts.searching then
+        valid_filter = true
+        break
+      end
     end
-  end
 
-  if not valid_filter then
-    vim.notify('[linksmd] You need to pass a valid searching', vim.log.levels.WARN, { render = 'minimal' })
-    return
-  end
+    if not valid_filter then
+      vim.notify('[linksmd] You need to pass a valid searching', vim.log.levels.WARN, { render = 'minimal' })
+      return
+    end
 
-  data.files = utils.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+    data.files = utils.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+  else
+    data.files = files
+  end
 
   setmetatable(data, DisplayNui)
 
@@ -45,12 +49,10 @@ function DisplayNui:init(opts, root_dir, follow_dir, only_dirs)
 end
 
 function DisplayNui:launch()
-  -- vim.cmd('messages clear')
-
   local nodes = {}
   local node_ids = {}
 
-  for _, file in ipairs(self.files.filtered) do
+  for _, file in ipairs(self.files.files) do
     local parts = vim.split(file, '/')
 
     nodes = tools.node_files(file, parts, nodes, node_ids)
@@ -110,6 +112,7 @@ function DisplayNui:launch()
   mappings.scroll_up(self, popup_tree, popup_preview)
   mappings.scroll_down(self, popup_tree, popup_preview)
   mappings.search_file(self, popup_tree)
+  mappings.search_dir(self, popup_tree)
 
   popup_tree:on(event.BufLeave, function()
     popup_preview:unmount()

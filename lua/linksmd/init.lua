@@ -60,7 +60,7 @@ M.display = function(directory)
   end
 
   if M.opts.display == 'nui' then
-    DisplayNui:init(M.opts, root_dir, directory, false):launch()
+    DisplayNui:init(M.opts, root_dir, directory, {}, true):launch()
   elseif M.opts.display == 'telescope' then
     print('USAR TELESCOPE')
   else

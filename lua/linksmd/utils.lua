@@ -18,11 +18,12 @@ end
 M.get_files = function(root_dir, extensions, hidden, only_dirs)
   local files = {
     all = {},
-    filtered = {},
+    files = {},
+    dirs = {},
   }
 
-  local scandir = plenary_scandir(root_dir, { hidden = hidden, only_dirs = true })
-  print(vim.inspect(scandir))
+  local scandir = plenary_scandir(root_dir, { hidden = hidden })
+
   for i = #scandir, 1, -1 do
     table.insert(files.all, scandir[i])
   end
@@ -34,7 +35,16 @@ M.get_files = function(root_dir, extensions, hidden, only_dirs)
 
     if string.find(ext, ',' .. file_ext .. ',') then
       local treat_file = string.gsub(file, '^' .. root_dir .. '/', '')
-      table.insert(files.filtered, treat_file)
+
+      table.insert(files.files, treat_file)
+
+      if only_dirs then
+        for dir in treat_file:gmatch('(.+)/.+%.' .. file_ext .. '$') do
+          if not vim.tbl_contains(files.dirs, dir) then
+            table.insert(files.dirs, dir)
+          end
+        end
+      end
     end
   end
 

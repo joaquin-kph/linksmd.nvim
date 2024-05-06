@@ -10,12 +10,13 @@ DisplayTelescope.__index = DisplayTelescope
 
 function DisplayTelescope:init(opts, root_dir, files, only_dirs)
   local data = {
+    only_dirs = only_dirs,
     root_dir = root_dir,
     opts = opts,
-    files = files,
+    files = nil,
   }
 
-  if not files.filtered or #files.filtered == 0 then
+  if not files.files or #files.files == 0 then
     local valid_filter = false
 
     for s, _ in pairs(data.opts.filters) do
@@ -31,6 +32,8 @@ function DisplayTelescope:init(opts, root_dir, files, only_dirs)
     end
 
     data.files = utils.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+  else
+    data.files = files
   end
 
   setmetatable(data, DisplayTelescope)
@@ -39,15 +42,24 @@ function DisplayTelescope:init(opts, root_dir, files, only_dirs)
 end
 
 function DisplayTelescope:launch()
-  -- vim.cmd('messages clear')
-
   local opts = {}
+
+  local results = {}
+  local prompt = nil
+
+  if self.only_dirs then
+    results = self.files.dirs
+    prompt = 'Buscar Directorio'
+  else
+    results = self.files.files
+    prompt = 'Buscar Nota'
+  end
 
   pickers
     .new(opts, {
-      prompt_title = 'Buscador de Notas',
+      prompt_title = prompt,
       finder = finders.new_table({
-        results = self.files.filtered,
+        results = results,
       }),
       sorter = conf.generic_sorter(opts),
       attach_mappings = function(bufnr, _)
@@ -56,7 +68,11 @@ function DisplayTelescope:launch()
 
           local selection = action_state.get_selected_entry()[1]
 
-          print(selection)
+          if self.only_dirs then
+            require('linksmd.display.nui'):init(self.opts, self.root_dir, selection, self.files, false):launch()
+          else
+            print(selection)
+          end
         end)
 
         return true

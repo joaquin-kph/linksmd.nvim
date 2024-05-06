@@ -188,7 +188,7 @@ M.search_file = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.search_file, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
-    DisplayTelescope:init(display.opts, display.root_dir, display.files, nil):launch()
+    DisplayTelescope:init(display.opts, display.root_dir, display.files, false):launch()
   end)
 end
 
@@ -196,7 +196,7 @@ M.search_dir = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.search_dir, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
-    DisplayTelescope:init(display.opts, display.root_dir, nil, true):launch()
+    DisplayTelescope:init(display.opts, display.root_dir, display.files, true):launch()
   end)
 end
 
