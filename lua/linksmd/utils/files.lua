@@ -15,14 +15,14 @@ M.get_root_dir = function()
   return mkdnflow.root_dir
 end
 
-M.get_files = function(root_dir, extensions, hidden, only_dirs)
+M.get_files = function(root_dir, extensions)
   local files = {
     all = {},
     files = {},
     dirs = {},
   }
 
-  local scandir = plenary_scandir(root_dir, { hidden = hidden })
+  local scandir = plenary_scandir(root_dir, { hidden = false })
 
   for i = #scandir, 1, -1 do
     table.insert(files.all, scandir[i])
@@ -38,11 +38,9 @@ M.get_files = function(root_dir, extensions, hidden, only_dirs)
 
       table.insert(files.files, treat_file)
 
-      if only_dirs then
-        for dir in treat_file:gmatch('(.+)/.+%.' .. file_ext .. '$') do
-          if not vim.tbl_contains(files.dirs, dir) then
-            table.insert(files.dirs, dir)
-          end
+      for dir in treat_file:gmatch('(.+)/.+%.' .. file_ext .. '$') do
+        if not vim.tbl_contains(files.dirs, dir) then
+          table.insert(files.dirs, dir)
         end
       end
     end
@@ -77,6 +75,10 @@ M.read_file = function(path)
   end
 
   return data
+end
+
+M.apply_file = function(file)
+  print('APLICANDO TEXTO ', file)
 end
 
 return M

@@ -3,12 +3,13 @@ local finders = require('telescope.finders')
 local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
+local previewers = require('telescope.previewers')
 local ufiles = require('linksmd.utils.files')
 
-local DisplayTelescope = {}
-DisplayTelescope.__index = DisplayTelescope
+local DisplayFinder = {}
+DisplayFinder.__index = DisplayFinder
 
-function DisplayTelescope:init(opts, root_dir, files, only_dirs)
+function DisplayFinder:init(opts, root_dir, files, only_dirs)
   local data = {
     only_dirs = only_dirs,
     root_dir = root_dir,
@@ -31,17 +32,17 @@ function DisplayTelescope:init(opts, root_dir, files, only_dirs)
       return
     end
 
-    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching])
   else
     data.files = files
   end
 
-  setmetatable(data, DisplayTelescope)
+  setmetatable(data, DisplayFinder)
 
   return data
 end
 
-function DisplayTelescope:launch()
+function DisplayFinder:launch()
   local opts = {}
 
   local results = {}
@@ -55,6 +56,11 @@ function DisplayTelescope:launch()
     prompt = 'Buscar Nota'
   end
 
+  if #results == 0 then
+    vim.notify('[linksmd] No items in all notebook', vim.log.levels.WARN, { render = 'minimal' })
+    return
+  end
+
   pickers
     .new(opts, {
       prompt_title = prompt,
@@ -62,17 +68,39 @@ function DisplayTelescope:launch()
         results = results,
       }),
       sorter = conf.generic_sorter(opts),
-      attach_mappings = function(bufnr, _)
+      previewer = previewers.new_buffer_previewer({
+        title = 'Mi Preview',
+        ---@diagnostic disable-next-line: redefined-local
+        define_preview = function(self, _, _)
+          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { 'Item A', 'Item B' })
+        end,
+      }),
+      attach_mappings = function(bufnr, map)
         actions.select_default:replace(function()
+          local selection = action_state.get_selected_entry()
+
+          if selection == nil then
+            vim.notify('[linksmd] You must select an option from menu', vim.log.levels.WARN, { render = 'minimal' })
+            return true
+          end
+
           actions.close(bufnr)
 
-          local selection = action_state.get_selected_entry()[1]
-
           if self.only_dirs then
-            require('linksmd.manager'):init(self.opts, self.root_dir, selection, self.files, false):launch()
+            require('linksmd.manager'):init(self.opts, self.root_dir, selection[1], self.files):launch()
           else
-            print(selection)
+            ufiles.apply_file(selection[1])
           end
+        end)
+
+        map('i', self.opts.keymaps.search_file, function()
+          require('linksmd.finder'):init(self.opts, self.root_dir, self.files, false):launch()
+        end)
+        map('i', self.opts.keymaps.search_dir, function()
+          require('linksmd.finder'):init(self.opts, self.root_dir, self.files, true):launch()
+        end)
+        map('i', self.opts.keymaps.change_searching, function()
+          require('linksmd.search'):init(self.opts, self.root_dir, self.files):launch()
         end)
 
         return true
@@ -81,4 +109,4 @@ function DisplayTelescope:launch()
     :find()
 end
 
-return DisplayTelescope
+return DisplayFinder

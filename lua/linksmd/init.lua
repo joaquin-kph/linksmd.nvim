@@ -24,9 +24,9 @@ M.setup = function(opts)
   }
 end
 
-M.display = function(directory)
+M.display = function(follow_dir)
   local root_dir = nil
-  directory = directory or nil
+  follow_dir = follow_dir or nil
 
   if M.opts.notebook_main ~= nil then
     if not plenary_path:new(M.opts.notebook_main):exists() then
@@ -43,8 +43,8 @@ M.display = function(directory)
     root_dir = ufiles.get_root_dir()
   end
 
-  if directory ~= nil then
-    if not plenary_path:new(directory):exists() then
+  if follow_dir ~= nil then
+    if not plenary_path:new(follow_dir):exists() then
       vim.notify(
         '[linksmd] You need to pass a correct directory for this notebook or nil',
         vim.log.levels.WARN,
@@ -58,17 +58,16 @@ M.display = function(directory)
     return
   end
 
-  if M.opts.display == 'nui' then
-    require('linksmd.manager'):init(M.opts, root_dir, directory, {}, true):launch()
-  elseif M.opts.display == 'telescope' then
+  if M.opts.display_init == 'nui' then
+    require('linksmd.manager'):init(M.opts, root_dir, follow_dir, {}):launch()
+  elseif M.opts.display_init == 'telescope' then
     print('USAR TELESCOPE')
   else
-    vim.notify('[linksmd] You need to configure the display', vim.log.levels.WARN, { render = 'minimal' })
+    vim.notify('[linksmd] You need to configure the display_init', vim.log.levels.WARN, { render = 'minimal' })
   end
 end
 
 M.setup({ display = 'nui' })
--- M.display('/home/hakyn/test/vault/notas/codigo/web')
 M.display()
 
 return M

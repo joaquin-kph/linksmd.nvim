@@ -1,7 +1,8 @@
 local Layout = require('nui.layout')
 local plenary_async = require('plenary.async')
 local ufiles = require('linksmd.utils.files')
-local DisplayTelescope = require('linksmd.finder')
+local DisplayFinder = require('linksmd.finder')
+local DisplaySearch = require('linksmd.search')
 
 local M = {}
 
@@ -49,8 +50,8 @@ M.enter = function(display, tree, popup_tree)
 
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('gg', true, false, true), 'n', true)
     else
-      local file = node.file
-      print(file)
+      ufiles.apply_file(node.file)
+      popup_tree:unmount()
     end
   end)
 end
@@ -188,7 +189,7 @@ M.search_file = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.search_file, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
-    DisplayTelescope:init(display.opts, display.root_dir, display.files, false):launch()
+    DisplayFinder:init(display.opts, display.root_dir, display.files, false):launch()
   end)
 end
 
@@ -196,13 +197,15 @@ M.search_dir = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.search_dir, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
-    DisplayTelescope:init(display.opts, display.root_dir, display.files, true):launch()
+    DisplayFinder:init(display.opts, display.root_dir, display.files, true):launch()
   end)
 end
 
 M.change_searching = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.change_searching, function()
-    print('CAMBIAR SEARCHING')
+    vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
+
+    DisplaySearch:init(display.opts, display.root_dir, display.files):launch()
   end)
 end
 

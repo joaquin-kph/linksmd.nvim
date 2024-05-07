@@ -8,7 +8,7 @@ local mappings = require('linksmd.utils.mappings')
 local DisplayNui = {}
 DisplayNui.__index = DisplayNui
 
-function DisplayNui:init(opts, root_dir, follow_dir, files, only_dirs)
+function DisplayNui:init(opts, root_dir, follow_dir, files)
   if follow_dir ~= nil then
     follow_dir = string.gsub(follow_dir, '^' .. root_dir .. '/', '')
   end
@@ -38,7 +38,7 @@ function DisplayNui:init(opts, root_dir, follow_dir, files, only_dirs)
       return
     end
 
-    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching], false, only_dirs)
+    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching])
   else
     data.files = files
   end

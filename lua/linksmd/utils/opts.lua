@@ -1,7 +1,7 @@
 return {
   notebook_main = vim.fn.expand('~') .. '/test',
   searching = 'markdown',
-  display = 'nui', -- TODO: Eliminar en un futuro, ya que la idea era hacer tambien una version con telescope pero por cuetiones de tiempo no me lo permite
+  display_init = 'nui',
   text = {
     preview = nil,
     menu = 'Notas',
@@ -11,7 +11,7 @@ return {
     books = { 'pdf' },
     images = { 'png', 'jpg' },
     sound = { 'mp3' },
-    urls = { 'https', 'http' },
+    buffer = { 'headers', 'urls' },
   },
   keymaps = {
     menu_enter = { '<cr>', '<tab>' },
