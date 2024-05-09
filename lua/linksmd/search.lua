@@ -46,10 +46,14 @@ function DisplaySearch:launch()
 
           self.opts.searching = selection[1]
 
+          _G.linksmd.nui.tree.level = 0
+          _G.linksmd.nui.tree.breadcrumb = {}
+          _G.linksmd.nui.tree.parent_files = {}
+
           if self.opts.display_init == 'nui' then
             require('linksmd.manager'):init(self.opts, self.root_dir, nil, {}):launch()
           elseif self.opts.display_init == 'telescope' then
-            require('links.finder'):init(self.opts.self.root_dir, {}, false)
+            require('linksmd.finder'):init(self.opts, self.root_dir, {}, false):launch()
           end
         end)
 

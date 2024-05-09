@@ -87,9 +87,12 @@ function DisplayNui:launch()
     }, { dir = 'col' })
   )
 
-  -- local tree2 = node_tree2(nodes)
   local tree = node.node_tree(nodes, {})
   if self.follow_dir ~= nil then
+    _G.linksmd.nui.tree.level = 0
+    _G.linksmd.nui.tree.breadcrumb = {}
+    _G.linksmd.nui.tree.parent_files = {}
+
     tree = node.node_tree_follow(tree, vim.split(self.follow_dir, '/'))
 
     popup_tree.border:set_text(

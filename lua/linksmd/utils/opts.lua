@@ -24,5 +24,6 @@ return {
     search_file = '<M-f>',
     search_dir = '<M-d>',
     change_searching = '<M-s>',
+    switch_manager = '<M-a>',
   },
 }

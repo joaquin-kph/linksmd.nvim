@@ -12,6 +12,7 @@ DisplayFinder.__index = DisplayFinder
 
 function DisplayFinder:init(opts, root_dir, files, only_dirs)
   local data = {
+    follow_dir = nil,
     only_dirs = only_dirs,
     root_dir = root_dir,
     opts = opts,
@@ -104,6 +105,15 @@ function DisplayFinder:launch()
         end)
         map('i', self.opts.keymaps.change_searching, function()
           require('linksmd.search'):init(self.opts, self.root_dir, self.files):launch()
+        end)
+        map('i', self.opts.keymaps.switch_manager, function()
+          actions.close(bufnr)
+
+          local follow_dir = table.concat(_G.linksmd.nui.tree.breadcrumb, '/')
+
+          require('linksmd.manager')
+            :init(self.opts, self.root_dir, follow_dir ~= '' and follow_dir or nil, self.files)
+            :launch()
         end)
 
         return true
