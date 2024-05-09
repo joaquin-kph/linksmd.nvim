@@ -93,7 +93,7 @@ function DisplayFinder:launch()
           if self.only_dirs then
             require('linksmd.manager'):init(self.opts, self.root_dir, selection[1], self.files):launch()
           else
-            ufiles.apply_file(selection[1])
+            ufiles.apply_file(self.opts, selection[1])
           end
         end)
 

@@ -77,8 +77,14 @@ M.read_file = function(path)
   return data
 end
 
-M.apply_file = function(file)
-  print('APLICANDO TEXTO ', file)
+M.apply_file = function(opts, file)
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+  vim.api.nvim_buf_set_text(0, cursor_pos[1] - 1, cursor_pos[2], cursor_pos[1] - 1, cursor_pos[2], { file })
+
+  print('APLICANDO TEXTO  ', file)
+
+  -- PRUEBA #vault/hakyn seyer.md
 end
 
 return M

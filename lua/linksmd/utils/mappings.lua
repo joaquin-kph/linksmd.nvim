@@ -39,7 +39,7 @@ M.enter = function(display, tree, popup_tree, popup_preview)
 
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('gg', true, false, true), 'n', true)
     else
-      ufiles.apply_file(node.file)
+      ufiles.apply_file(display.opts, node.file)
       popup_tree:unmount()
     end
   end)
