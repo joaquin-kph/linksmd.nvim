@@ -61,7 +61,7 @@ M.display = function(follow_dir)
   if M.opts.display_init == 'nui' then
     require('linksmd.manager'):init(M.opts, root_dir, follow_dir, {}):launch()
   elseif M.opts.display_init == 'telescope' then
-    print('USAR TELESCOPE')
+    require('linksmd.finder'):init(M.opts, root_dir, {}, false):launch()
   else
     vim.notify('[linksmd] You need to configure the display_init', vim.log.levels.WARN, { render = 'minimal' })
   end

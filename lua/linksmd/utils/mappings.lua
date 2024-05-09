@@ -1,35 +1,12 @@
 local Layout = require('nui.layout')
-local plenary_async = require('plenary.async')
 local ufiles = require('linksmd.utils.files')
 local DisplayFinder = require('linksmd.finder')
 local DisplaySearch = require('linksmd.search')
+local unode = require('linksmd.utils.node')
 
 local M = {}
 
-local function preview_data(bufnr_preview, root_dir, item)
-  if item == nil then
-    return
-  end
-
-  local path = string.format('%s/%s', root_dir, item)
-
-  plenary_async.run(function()
-    local data = ufiles.read_file(path)
-    local text = vim.split(data and data or '', '\n')
-
-    vim.schedule(function()
-      vim.api.nvim_buf_set_lines(bufnr_preview, 0, -1, false, text)
-
-      vim.api.nvim_buf_call(bufnr_preview, function()
-        if vim.api.nvim_buf_line_count(bufnr_preview) > 5 then
-          vim.api.nvim_win_set_cursor(0, { 5, 0 })
-        end
-      end)
-    end)
-  end)
-end
-
-M.enter = function(display, tree, popup_tree)
+M.enter = function(display, tree, popup_tree, popup_preview)
   popup_tree:map('n', display.opts.keymaps.menu_enter, function()
     ---@diagnostic disable-next-line: redefined-local
     local node = tree:get_node()
@@ -41,6 +18,18 @@ M.enter = function(display, tree, popup_tree)
 
       tree:set_nodes(node.children)
       tree:render()
+
+      if not node.children[1].children then
+        unode.preview_data(display.root_dir, node.children[1].file, function(text)
+          vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
+
+          vim.api.nvim_buf_call(popup_preview.bufnr, function()
+            if vim.api.nvim_buf_line_count(popup_preview.bufnr) > 5 then
+              vim.api.nvim_win_set_cursor(0, { 5, 0 })
+            end
+          end)
+        end)
+      end
 
       popup_tree.border:set_text(
         'top',
@@ -132,7 +121,15 @@ M.sroll_preview = function(display, layout, tree, popup_tree, popup_preview)
         Layout.Box(popup_tree, { size = '40%' }),
       }, { dir = 'col' }))
 
-      preview_data(popup_preview.bufnr, display.root_dir, tree:get_node().file)
+      unode.preview_data(display.root_dir, tree:get_node().file, function(text)
+        vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
+
+        vim.api.nvim_buf_call(popup_preview.bufnr, function()
+          if vim.api.nvim_buf_line_count(popup_preview.bufnr) > 5 then
+            vim.api.nvim_win_set_cursor(0, { 5, 0 })
+          end
+        end)
+      end)
     end
 
     display.preview.state = not display.preview.state
@@ -154,7 +151,15 @@ M.menu_down = function(display, tree, popup_tree, popup_preview)
       file = tree:get_nodes()[item_pos].file
 
       if file ~= nil then
-        preview_data(popup_preview.bufnr, display.root_dir, file)
+        unode.preview_data(display.root_dir, file, function(text)
+          vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
+
+          vim.api.nvim_buf_call(popup_preview.bufnr, function()
+            if vim.api.nvim_buf_line_count(popup_preview.bufnr) > 5 then
+              vim.api.nvim_win_set_cursor(0, { 5, 0 })
+            end
+          end)
+        end)
       else
         vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, {})
       end
@@ -177,7 +182,15 @@ M.menu_up = function(display, tree, popup_tree, popup_preview)
       file = tree:get_nodes()[item_pos].file
 
       if file ~= nil then
-        preview_data(popup_preview.bufnr, display.root_dir, file)
+        unode.preview_data(display.root_dir, file, function(text)
+          vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
+
+          vim.api.nvim_buf_call(popup_preview.bufnr, function()
+            if vim.api.nvim_buf_line_count(popup_preview.bufnr) > 5 then
+              vim.api.nvim_win_set_cursor(0, { 5, 0 })
+            end
+          end)
+        end)
       else
         vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, {})
       end

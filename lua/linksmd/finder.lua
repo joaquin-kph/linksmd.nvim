@@ -5,6 +5,7 @@ local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local previewers = require('telescope.previewers')
 local ufiles = require('linksmd.utils.files')
+local unode = require('linksmd.utils.node')
 
 local DisplayFinder = {}
 DisplayFinder.__index = DisplayFinder
@@ -47,6 +48,7 @@ function DisplayFinder:launch()
 
   local results = {}
   local prompt = nil
+  local root_dir = self.root_dir
 
   if self.only_dirs then
     results = self.files.dirs
@@ -68,11 +70,12 @@ function DisplayFinder:launch()
         results = results,
       }),
       sorter = conf.generic_sorter(opts),
-      previewer = previewers.new_buffer_previewer({
-        title = 'Mi Preview',
+      previewer = self.only_dirs == false and previewers.new_buffer_previewer({
         ---@diagnostic disable-next-line: redefined-local
-        define_preview = function(self, _, _)
-          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { 'Item A', 'Item B' })
+        define_preview = function(self, entry, _)
+          unode.preview_data(root_dir, entry[1], function(text)
+            vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, text)
+          end)
         end,
       }),
       attach_mappings = function(bufnr, map)

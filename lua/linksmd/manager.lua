@@ -104,7 +104,7 @@ function DisplayNui:launch()
   layout:mount()
   menu_tree:render()
 
-  mappings.enter(self, menu_tree, popup_tree)
+  mappings.enter(self, menu_tree, popup_tree, popup_preview)
   mappings.back(self, menu_tree, popup_tree, popup_preview)
   mappings.menu_up(self, menu_tree, popup_tree, popup_preview)
   mappings.menu_down(self, menu_tree, popup_tree, popup_preview)

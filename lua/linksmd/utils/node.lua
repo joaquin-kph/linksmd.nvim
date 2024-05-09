@@ -1,4 +1,6 @@
 local Tree = require('nui.tree')
+local plenary_async = require('plenary.async')
+local ufiles = require('linksmd.utils.files')
 
 local M = {}
 
@@ -79,6 +81,23 @@ M.node_files = function(file, parts, node, aux_ids)
   end
 
   return node
+end
+
+M.preview_data = function(root_dir, item, callback)
+  if item == nil then
+    return
+  end
+
+  local path = string.format('%s/%s', root_dir, item)
+
+  plenary_async.run(function()
+    local data = ufiles.read_file(path)
+    local text = vim.split(data and data or '', '\n')
+
+    vim.schedule(function()
+      callback(text)
+    end)
+  end)
 end
 
 return M
