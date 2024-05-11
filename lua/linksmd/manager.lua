@@ -69,8 +69,8 @@ function DisplayNui:launch()
     return
   end
 
-  local popup_preview = components.popup(false, false, self.opts.text.preview)
-  local popup_tree = components.popup(true, true, self.opts.text.menu)
+  local popup_preview = components.popup(false, false, self.opts.custom.text.preview)
+  local popup_tree = components.popup(true, true, self.opts.custom.text.menu)
   local menu_tree = components.tree(popup_tree.bufnr)
 
   popup_tree.border:set_text('bottom', string.format(' Notebook: %s ', self.opts.notebook_main), 'right')
@@ -88,6 +88,7 @@ function DisplayNui:launch()
   end
 
   local layout = Layout({
+    relative = 'editor',
     position = '50%',
     size = {
       width = '70%',
@@ -95,7 +96,16 @@ function DisplayNui:launch()
     },
   }, boxes)
 
-  local tree = node.node_tree(nodes, {})
+  local icons_tree = {
+    self.opts.custom.icons.directory,
+  }
+
+  if self.opts.custom.icons[self.opts.resource] then
+    table.insert(icons_tree, self.opts.custom.icons[self.opts.resource])
+  end
+
+  local tree = node.node_tree(nodes, {}, icons_tree)
+
   if self.follow_dir ~= nil then
     _G.linksmd.nui.tree.level = 0
     _G.linksmd.nui.tree.breadcrumb = {}
@@ -105,7 +115,7 @@ function DisplayNui:launch()
 
     popup_tree.border:set_text(
       'top',
-      string.format(' %s -> %s ', self.opts.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
+      string.format(' %s -> %s ', self.opts.custom.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
       'left'
     )
   end

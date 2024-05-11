@@ -14,7 +14,7 @@ M.enter = function(display, tree, popup_tree, popup_preview)
     if node.children then
       table.insert(_G.linksmd.nui.tree.parent_files, tree:get_nodes())
       _G.linksmd.nui.tree.level = _G.linksmd.nui.tree.level + 1
-      table.insert(_G.linksmd.nui.tree.breadcrumb, node.text)
+      table.insert(_G.linksmd.nui.tree.breadcrumb, node.text_raw)
 
       tree:set_nodes(node.children)
       tree:render()
@@ -33,7 +33,7 @@ M.enter = function(display, tree, popup_tree, popup_preview)
 
       popup_tree.border:set_text(
         'top',
-        string.format(' %s -> %s ', display.opts.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
+        string.format(' %s -> %s ', display.opts.custom.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
         'left'
       )
 
@@ -55,11 +55,11 @@ M.back = function(display, tree, popup_tree, popup_preview)
       if #_G.linksmd.nui.tree.breadcrumb > 0 then
         popup_tree.border:set_text(
           'top',
-          string.format(' %s -> %s ', display.opts.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
+          string.format(' %s -> %s ', display.opts.custom.text.menu, table.concat(_G.linksmd.nui.tree.breadcrumb, '/')),
           'left'
         )
       else
-        popup_tree.border:set_text('top', string.format(' %s ', display.opts.text.menu), 'left')
+        popup_tree.border:set_text('top', string.format(' %s ', display.opts.custom.text.menu), 'left')
       end
 
       tree:render()

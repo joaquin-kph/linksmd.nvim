@@ -10,12 +10,12 @@ M.node_tree_follow = function(tree, follow_dir, final_tree)
   end
 
   for i, v in ipairs(tree) do
-    if v.text == follow_dir[1] then
+    if v.text_raw == follow_dir[1] then
       table.remove(follow_dir, 1)
 
       table.insert(_G.linksmd.nui.tree.parent_files, tree)
       _G.linksmd.nui.tree.level = _G.linksmd.nui.tree.level + 1
-      table.insert(_G.linksmd.nui.tree.breadcrumb, v.text)
+      table.insert(_G.linksmd.nui.tree.breadcrumb, v.text_raw)
 
       if tree[i].children then
         final_tree = M.node_tree_follow(tree[i].children, follow_dir, tree[i].children)
@@ -27,23 +27,43 @@ M.node_tree_follow = function(tree, follow_dir, final_tree)
   return final_tree
 end
 
-M.node_tree = function(nodes, tree)
+M.node_tree = function(nodes, tree, icons_tree)
   local item_pos = 1
+
+  local icon_dir = icons_tree[1] or nil
+  local icon_resource = icons_tree[2] or nil
 
   for i, v in ipairs(nodes) do
     if #v == 0 then
       local child_tree = nil
 
       if nodes[i + 1] and #nodes[i + 1] > 0 then
-        child_tree = M.node_tree(nodes[i + 1], {})
+        child_tree = M.node_tree(nodes[i + 1], {}, icons_tree)
       end
 
       if child_tree ~= nil then
         -- table.insert(tree, { DIR = v.text, children = child_tree })
-        table.insert(tree, Tree.Node({ text = v.text, file = v.file, children = child_tree, item_pos = item_pos }))
+        table.insert(
+          tree,
+          Tree.Node({
+            text = string.format('%s%s', icon_dir ~= nil and icon_dir .. '  ' or '', v.text),
+            text_raw = v.text,
+            file = v.file,
+            children = child_tree,
+            item_pos = item_pos,
+          })
+        )
       else
         -- table.insert(tree, { FILE = v.text })
-        table.insert(tree, Tree.Node({ text = v.text, file = v.file, item_pos = item_pos }))
+        table.insert(
+          tree,
+          Tree.Node({
+            text = string.format('%s%s', icon_resource ~= nil and icon_resource .. '  ' or '', v.text),
+            text_raw = v.text,
+            file = v.file,
+            item_pos = item_pos,
+          })
+        )
       end
 
       item_pos = item_pos + 1
