@@ -1,15 +1,20 @@
 return {
   notebook_main = vim.fn.expand('~') .. '/test',
-  searching = 'markdown',
-  display_init = 'telescope',
+  resource = 'books',
+  display_init = 'nui',
   text = {
     preview = nil,
     menu = 'Notas',
   },
-  filters = {
-    markdown = { 'md', 'rmd' },
+  dir_resources = {
+    books = '/books',
+    images = '/images',
+    sound = '/sound',
+  },
+  resources = {
+    notes = { 'md', 'rmd' },
     books = { 'pdf' },
-    images = { 'png', 'jpg' },
+    images = { 'png', 'jpg', 'jpeg' },
     sound = { 'mp3' },
     buffer = { 'headers', 'urls' },
   },

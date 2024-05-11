@@ -26,19 +26,21 @@ function DisplayNui:init(opts, root_dir, follow_dir, files)
   if not files.files or #files.files == 0 then
     local valid_filter = false
 
-    for s, _ in pairs(data.opts.filters) do
-      if s == data.opts.searching then
+    for s, _ in pairs(data.opts.resources) do
+      if s == data.opts.resource then
         valid_filter = true
         break
       end
     end
 
     if not valid_filter then
-      vim.notify('[linksmd] You need to pass a valid searching', vim.log.levels.WARN, { render = 'minimal' })
+      vim.notify('[linksmd] You need to pass a valid resource', vim.log.levels.WARN, { render = 'minimal' })
       return
     end
 
-    data.files = ufiles.get_files(data.root_dir, data.opts.filters[data.opts.searching])
+    local dir_resource = data.opts.dir_resources[data.opts.resource] and data.opts.dir_resources[data.opts.resource]
+
+    data.files = ufiles.get_files(data.root_dir, data.opts.resources[data.opts.resource], dir_resource)
   else
     data.files = files
   end

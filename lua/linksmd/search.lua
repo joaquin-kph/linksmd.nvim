@@ -23,7 +23,7 @@ end
 function DisplaySearch:launch()
   local opts = dropdown
 
-  local results = vim.tbl_keys(self.opts.filters)
+  local results = vim.tbl_keys(self.opts.resources)
   local prompt = 'Establecer Filtro'
 
   pickers
@@ -44,7 +44,7 @@ function DisplaySearch:launch()
 
           actions.close(bufnr)
 
-          self.opts.searching = selection[1]
+          self.opts.resource = selection[1]
 
           _G.linksmd.nui.tree.level = 0
           _G.linksmd.nui.tree.breadcrumb = {}
@@ -63,8 +63,15 @@ function DisplaySearch:launch()
         map('i', self.opts.keymaps.search_dir, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, true):launch()
         end)
-        map('i', self.opts.keymaps.change_searching, function()
-          require('linksmd.search'):init(self.opts, self.root_dir):launch()
+        map('i', self.opts.keymaps.change_searching)
+        map('i', self.opts.keymaps.switch_manager, function()
+          actions.close(bufnr)
+
+          local follow_dir = table.concat(_G.linksmd.nui.tree.breadcrumb, '/')
+
+          require('linksmd.manager')
+            :init(self.opts, self.root_dir, follow_dir ~= '' and follow_dir or nil, self.files)
+            :launch()
         end)
 
         return true

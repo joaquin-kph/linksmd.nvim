@@ -15,14 +15,20 @@ M.get_root_dir = function()
   return mkdnflow.root_dir
 end
 
-M.get_files = function(root_dir, extensions)
+M.get_files = function(root_dir, extensions, dir_resource)
   local files = {
     all = {},
     files = {},
     dirs = {},
   }
 
-  local scandir = plenary_scandir(root_dir, { hidden = false })
+  local dir_files = root_dir
+
+  if dir_resource ~= nil then
+    dir_files = dir_files .. dir_resource
+  end
+
+  local scandir = plenary_scandir(dir_files, { hidden = false })
 
   for i = #scandir, 1, -1 do
     table.insert(files.all, scandir[i])

@@ -66,7 +66,7 @@ M.display = function(follow_dir)
     vim.notify('[linksmd] You need to configure the display_init', vim.log.levels.WARN, { render = 'minimal' })
   end
 end
-
+vim.cmd('message clear')
 M.setup({ display = 'nui' })
 M.display()
 
