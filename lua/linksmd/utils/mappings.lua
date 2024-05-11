@@ -109,8 +109,12 @@ M.scroll_up = function(display, popup_tree, popup_preview)
   end)
 end
 
-M.sroll_preview = function(display, layout, tree, popup_tree, popup_preview)
+M.switch_preview = function(display, layout, tree, popup_tree, popup_preview)
   popup_tree:map('n', display.opts.keymaps.scroll_preview, function()
+    if display.opts.resource ~= 'notes' then
+      return
+    end
+
     if display.preview.state then
       layout:update(Layout.Box({
         Layout.Box(popup_tree, { size = '100%' }),

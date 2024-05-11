@@ -75,19 +75,25 @@ function DisplayNui:launch()
 
   popup_tree.border:set_text('bottom', string.format(' Notebook: %s ', self.opts.notebook_main), 'right')
 
-  local layout = Layout(
-    {
-      position = '50%',
-      size = {
-        width = '70%',
-        height = '50%',
-      },
-    },
-    Layout.Box({
+  local boxes = nil
+  if self.opts.resource == 'notes' then
+    boxes = Layout.Box({
       Layout.Box(popup_preview, { size = '60%' }),
       Layout.Box(popup_tree, { size = '40%' }),
     }, { dir = 'col' })
-  )
+  else
+    boxes = Layout.Box({
+      Layout.Box(popup_tree, { size = '100%' }),
+    }, { dir = 'col' })
+  end
+
+  local layout = Layout({
+    position = '50%',
+    size = {
+      width = '70%',
+      height = '50%',
+    },
+  }, boxes)
 
   local tree = node.node_tree(nodes, {})
   if self.follow_dir ~= nil then
@@ -113,7 +119,7 @@ function DisplayNui:launch()
   mappings.back(self, menu_tree, popup_tree, popup_preview)
   mappings.menu_up(self, menu_tree, popup_tree, popup_preview)
   mappings.menu_down(self, menu_tree, popup_tree, popup_preview)
-  mappings.sroll_preview(self, layout, menu_tree, popup_tree, popup_preview)
+  mappings.switch_preview(self, layout, menu_tree, popup_tree, popup_preview)
   mappings.scroll_up(self, popup_tree, popup_preview)
   mappings.scroll_down(self, popup_tree, popup_preview)
   mappings.search_file(self, popup_tree)

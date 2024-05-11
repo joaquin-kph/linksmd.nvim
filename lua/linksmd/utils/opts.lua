@@ -1,7 +1,7 @@
 return {
   notebook_main = vim.fn.expand('~') .. '/test',
   resource = 'books',
-  display_init = 'nui',
+  display_init = 'telescope',
   text = {
     preview = nil,
     menu = 'Notas',

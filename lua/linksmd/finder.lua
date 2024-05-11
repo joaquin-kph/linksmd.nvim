@@ -15,9 +15,14 @@ function DisplayFinder:init(opts, root_dir, files, only_dirs)
     follow_dir = nil,
     only_dirs = only_dirs,
     root_dir = root_dir,
+    open_preview = false,
     opts = opts,
     files = nil,
   }
+
+  if opts.resource == 'notes' and data.only_dirs == false then
+    data.open_preview = true
+  end
 
   if not files.files or #files.files == 0 then
     local valid_filter = false
@@ -74,7 +79,7 @@ function DisplayFinder:launch()
         results = results,
       }),
       sorter = conf.generic_sorter(opts),
-      previewer = self.only_dirs == false and previewers.new_buffer_previewer({
+      previewer = self.open_preview == true and previewers.new_buffer_previewer({
         ---@diagnostic disable-next-line: redefined-local
         define_preview = function(self, entry, _)
           unode.preview_data(root_dir, entry[1], function(text)
