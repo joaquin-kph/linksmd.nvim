@@ -18,10 +18,6 @@ function DisplayFinder:init(opts, root_dir, files, only_dirs)
     open_preview = false,
     opts = opts,
     files = nil,
-    file_bufnr = {
-      id = vim.api.nvim_get_current_buf(),
-      cursor = vim.api.nvim_win_get_cursor(0),
-    },
   }
 
   if opts.resource == 'notes' and data.only_dirs == false then
@@ -105,7 +101,7 @@ function DisplayFinder:launch()
           if self.only_dirs then
             require('linksmd.manager'):init(self.opts, self.root_dir, selection[1], self.files):launch()
           else
-            ufiles.apply_file(self.opts, selection[1], self.file_bufnr)
+            ufiles.apply_file(self.opts, selection[1])
           end
         end)
 

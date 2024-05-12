@@ -83,7 +83,7 @@ M.read_file = function(path)
   return data
 end
 
-M.apply_file = function(opts, file, buffer)
+M.apply_file = function(opts, file)
   local col_remove = 0
 
   if opts.buffer.flag then
@@ -91,11 +91,11 @@ M.apply_file = function(opts, file, buffer)
   end
 
   vim.api.nvim_buf_set_text(
-    buffer.id,
-    buffer.cursor[1] - 1,
-    buffer.cursor[2] - col_remove,
-    buffer.cursor[1] - 1,
-    buffer.cursor[2],
+    opts.buffer.id,
+    opts.buffer.cursor[1] - 1,
+    opts.buffer.cursor[2] - col_remove,
+    opts.buffer.cursor[1] - 1,
+    opts.buffer.cursor[2],
     { file }
   )
 end

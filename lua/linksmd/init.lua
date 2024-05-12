@@ -27,6 +27,8 @@ end
 M.display = function(resource, display_init, follow_dir)
   if resource == 'flags' then
     M.opts.buffer = {
+      id = vim.api.nvim_get_current_buf(),
+      cursor = vim.api.nvim_win_get_cursor(0),
       line = vim.api.nvim_get_current_line(),
       flag = nil,
     }

@@ -21,10 +21,6 @@ function DisplayNui:init(opts, root_dir, follow_dir, files)
     },
     files = nil,
     follow_dir = follow_dir,
-    file_bufnr = {
-      id = vim.api.nvim_get_current_buf(),
-      cursor = vim.api.nvim_win_get_cursor(0),
-    },
   }
 
   if not files.files or #files.files == 0 then
