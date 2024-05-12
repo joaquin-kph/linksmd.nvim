@@ -25,24 +25,30 @@ M.setup = function(opts)
 end
 
 M.display = function(resource, display_init, follow_dir)
-  if resource == 'flags' then
-    M.opts.buffer = {
-      id = vim.api.nvim_get_current_buf(),
-      cursor = vim.api.nvim_win_get_cursor(0),
-      line = vim.api.nvim_get_current_line(),
-      flag = nil,
-    }
+  M.opts.buffer = {
+    id = vim.api.nvim_get_current_buf(),
+    cursor = vim.api.nvim_win_get_cursor(0),
+    line = vim.api.nvim_get_current_line(),
+  }
 
-    for v in M.opts.buffer.line:gmatch('#%w+') do
-      M.opts.buffer.flag = v:sub(2)
-    end
+  if resource == 'flags' then
+    M.opts.buffer.flag = nil
 
     local flag_changed = false
 
-    for k, v in pairs(M.opts.flags) do
-      if v == M.opts.buffer.flag then
-        M.opts.resource = k
-        flag_changed = true
+    for v in M.opts.buffer.line:gmatch('#%w+') do
+      print(v)
+      M.opts.buffer.flag = v:sub(2)
+
+      for k2, v2 in pairs(M.opts.flags) do
+        if v2 == M.opts.buffer.flag then
+          M.opts.resource = k2
+          flag_changed = true
+          break
+        end
+      end
+
+      if flag_changed then
         break
       end
     end
@@ -93,6 +99,11 @@ M.display = function(resource, display_init, follow_dir)
     return
   end
 
+  if M.opts.resource == 'headers' then
+    require('linksmd.headers'):init(M.opts, root_dir, 'aqui.md'):launch()
+    return
+  end
+
   if M.opts.display_init == 'nui' then
     require('linksmd.manager'):init(M.opts, root_dir, follow_dir, {}):launch()
   elseif M.opts.display_init == 'telescope' then
@@ -102,7 +113,7 @@ M.display = function(resource, display_init, follow_dir)
   end
 end
 vim.cmd('message clear')
--- M.setup({ display = 'nui' })
--- M.display('flags')
+-- M.setup()
+-- M.display(nil, 'nui')
 
 return M

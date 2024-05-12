@@ -83,21 +83,46 @@ M.read_file = function(path)
   return data
 end
 
-M.apply_file = function(opts, file)
-  local col_remove = 0
+local replace_line = function(line, regex, replace, n_ocurrence)
+  local pos_a, pos_b = 1, 0
 
-  if opts.buffer.flag then
-    col_remove = #opts.buffer.flag + 1
+  for _ = 1, n_ocurrence do
+    pos_a, pos_b = line:find(regex, pos_b + 1)
+    if not pos_a then
+      break
+    end
   end
 
-  vim.api.nvim_buf_set_text(
-    opts.buffer.id,
-    opts.buffer.cursor[1] - 1,
-    opts.buffer.cursor[2] - col_remove,
-    opts.buffer.cursor[1] - 1,
-    opts.buffer.cursor[2],
-    { file }
-  )
+  if pos_a then
+    local part_a = line:sub(1, pos_a - 1)
+    local part_b = line:sub(pos_b + 1)
+    return string.format('%s%s%s', part_a, replace, part_b)
+  end
+
+  return line
+end
+
+M.apply_file = function(opts, file)
+  -- local new_line = opts.buffer.line:gsub('%(.-%)', string.format('(%s)', file), 1)
+  local new_line = replace_line(opts.buffer.line, '%(.-%)', string.format('(%s)', file), 1)
+
+  print(opts.buffer.line)
+  print(new_line)
+
+  -- local col_remove = 0
+
+  -- if opts.buffer.flag then
+  --   col_remove = #opts.buffer.flag + 1
+  -- end
+
+  -- vim.api.nvim_buf_set_text(
+  --   opts.buffer.id,
+  --   opts.buffer.cursor[1] - 1,
+  --   opts.buffer.cursor[2] - col_remove,
+  --   opts.buffer.cursor[1] - 1,
+  --   opts.buffer.cursor[2],
+  --   { file }
+  -- )
 end
 
 return M

@@ -62,7 +62,7 @@ function DisplayNui:launch()
 
   if #nodes == 0 then
     vim.notify(
-      string.format('[linksmd] No found notes in this notebook (%s)', self.opts.notebook_main),
+      string.format('[linksmd] No found %s in this notebook (%s)', self.opts.resource, self.opts.notebook_main),
       vim.log.levels.WARN,
       { render = 'minimal' }
     )
