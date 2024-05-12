@@ -83,14 +83,21 @@ M.read_file = function(path)
   return data
 end
 
-M.apply_file = function(opts, file)
-  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+M.apply_file = function(opts, file, buffer)
+  local col_remove = 0
 
-  vim.api.nvim_buf_set_text(0, cursor_pos[1] - 1, cursor_pos[2], cursor_pos[1] - 1, cursor_pos[2], { file })
+  if opts.buffer.flag then
+    col_remove = #opts.buffer.flag + 1
+  end
 
-  print('APLICANDO TEXTO  ', file)
-
-  -- PRUEBA #vault/hakyn seyer.md
+  vim.api.nvim_buf_set_text(
+    buffer.id,
+    buffer.cursor[1] - 1,
+    buffer.cursor[2] - col_remove,
+    buffer.cursor[1] - 1,
+    buffer.cursor[2],
+    { file }
+  )
 end
 
 return M

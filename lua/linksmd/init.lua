@@ -24,7 +24,40 @@ M.setup = function(opts)
   }
 end
 
-M.display = function(follow_dir)
+M.display = function(resource, display_init, follow_dir)
+  if resource == 'flags' then
+    M.opts.buffer = {
+      line = vim.api.nvim_get_current_line(),
+      flag = nil,
+    }
+
+    for v in M.opts.buffer.line:gmatch('#%w+') do
+      M.opts.buffer.flag = v:sub(2)
+    end
+
+    local flag_changed = false
+
+    for k, v in pairs(M.opts.flags) do
+      if v == M.opts.buffer.flag then
+        M.opts.resource = k
+        flag_changed = true
+        break
+      end
+    end
+
+    if not flag_changed then
+      M.opts.resource = 'notes'
+    end
+  elseif M.opts.resources[resource] then
+    M.opts.resource = resource
+  end
+
+  if display_init ~= nil and display_init ~= '' then
+    if display_init == 'telescope' or display_init == 'nui' then
+      M.opts.display_init = display_init
+    end
+  end
+
   local root_dir = nil
   follow_dir = follow_dir or nil
 
@@ -67,7 +100,7 @@ M.display = function(follow_dir)
   end
 end
 vim.cmd('message clear')
-M.setup({ display = 'nui' })
-M.display()
+-- M.setup({ display = 'nui' })
+-- M.display('flags')
 
 return M
