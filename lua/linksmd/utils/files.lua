@@ -85,9 +85,21 @@ end
 
 local replace_line = function(line, regex, replace, n_ocurrence)
   local pos_a, pos_b = 1, 0
+  local middle_flag = false
 
   for _ = 1, n_ocurrence do
     pos_a, pos_b = line:find(regex, pos_b + 1)
+
+    local original = line:sub(pos_a + 1, pos_b - 1)
+
+    local simbol_pos = original:find('#')
+
+    middle_flag = false
+    if simbol_pos ~= nil and simbol_pos > 1 and (pos_a + simbol_pos) < pos_b then
+      pos_a = pos_a + simbol_pos
+      middle_flag = true
+    end
+
     if not pos_a then
       break
     end
@@ -96,6 +108,11 @@ local replace_line = function(line, regex, replace, n_ocurrence)
   if pos_a then
     local part_a = line:sub(1, pos_a - 1)
     local part_b = line:sub(pos_b + 1)
+
+    if middle_flag then
+      replace = replace:sub(2, -1)
+    end
+
     return string.format('%s%s%s', part_a, replace, part_b)
   end
 
@@ -103,26 +120,28 @@ local replace_line = function(line, regex, replace, n_ocurrence)
 end
 
 M.apply_file = function(opts, file)
-  -- local new_line = opts.buffer.line:gsub('%(.-%)', string.format('(%s)', file), 1)
-  local new_line = replace_line(opts.buffer.line, '%(.-%)', string.format('(%s)', file), 1)
+  local link_line = nil
+  local cursor_col_start = nil
+  local cursor_col_end = nil
 
-  print(opts.buffer.line)
-  print(new_line)
+  if _G.linksmd.flags.level then
+    link_line = replace_line(opts.buffer.line, '%b()', string.format('(%s)', file), _G.linksmd.flags.level)
+    cursor_col_start = 0
+    cursor_col_end = opts.buffer.line:len()
+  else
+    link_line = file
+    cursor_col_start = opts.buffer.cursor[2]
+    cursor_col_end = opts.buffer.cursor[2]
+  end
 
-  -- local col_remove = 0
-
-  -- if opts.buffer.flag then
-  --   col_remove = #opts.buffer.flag + 1
-  -- end
-
-  -- vim.api.nvim_buf_set_text(
-  --   opts.buffer.id,
-  --   opts.buffer.cursor[1] - 1,
-  --   opts.buffer.cursor[2] - col_remove,
-  --   opts.buffer.cursor[1] - 1,
-  --   opts.buffer.cursor[2],
-  --   { file }
-  -- )
+  vim.api.nvim_buf_set_text(
+    opts.buffer.id,
+    opts.buffer.cursor[1] - 1,
+    cursor_col_start,
+    opts.buffer.cursor[1] - 1,
+    cursor_col_end,
+    { link_line }
+  )
 end
 
 return M

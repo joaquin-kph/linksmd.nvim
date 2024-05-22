@@ -4,16 +4,11 @@ local plenary_path = require('plenary.path')
 
 local M = {}
 
-M.setup = function(opts)
-  local main_opts = default_opts
-
-  if opts then
-    main_opts = vim.tbl_deep_extend('force', main_opts, opts)
-  end
-
-  M.opts = main_opts
-
+local function clear_globals()
   _G.linksmd = {
+    flags = {
+      pos = nil,
+    },
     nui = {
       tree = {
         level = 0,
@@ -24,46 +19,25 @@ M.setup = function(opts)
   }
 end
 
-M.display = function(resource, display_init, follow_dir)
-  M.opts.buffer = {
-    id = vim.api.nvim_get_current_buf(),
-    cursor = vim.api.nvim_win_get_cursor(0),
-    line = vim.api.nvim_get_current_line(),
-  }
+M.setup = function(opts)
+  local main_opts = default_opts
 
-  if resource == 'flags' then
-    M.opts.buffer.flag = nil
-
-    local flag_changed = false
-
-    for v in M.opts.buffer.line:gmatch('#%w+') do
-      print(v)
-      M.opts.buffer.flag = v:sub(2)
-
-      for k2, v2 in pairs(M.opts.flags) do
-        if v2 == M.opts.buffer.flag then
-          M.opts.resource = k2
-          flag_changed = true
-          break
-        end
-      end
-
-      if flag_changed then
-        break
-      end
-    end
-
-    if not flag_changed then
-      M.opts.resource = 'notes'
-    end
-  elseif M.opts.resources[resource] then
-    M.opts.resource = resource
+  if opts then
+    main_opts = vim.tbl_deep_extend('force', main_opts, opts)
   end
 
-  if display_init ~= nil and display_init ~= '' then
-    if display_init == 'telescope' or display_init == 'nui' then
-      M.opts.display_init = display_init
-    end
+  M.opts = main_opts
+
+  clear_globals()
+end
+
+M.display = function(resource, display_init, follow_dir)
+  vim.cmd('messages clear')
+
+  clear_globals()
+
+  if display_init ~= nil and display_init ~= '' and (display_init == 'telescope' or display_init == 'nui') then
+    M.opts.display_init = display_init
   end
 
   local root_dir = nil
@@ -84,6 +58,11 @@ M.display = function(resource, display_init, follow_dir)
     root_dir = ufiles.get_root_dir()
   end
 
+  if root_dir == nil then
+    vim.notify('[linksmd] You need to go to any notebook', vim.log.levels.WARN, { render = 'minimal' })
+    return
+  end
+
   if follow_dir ~= nil then
     if not plenary_path:new(follow_dir):exists() then
       vim.notify(
@@ -91,16 +70,84 @@ M.display = function(resource, display_init, follow_dir)
         vim.log.levels.WARN,
         { render = 'minimal' }
       )
+
+      return
     end
   end
 
-  if root_dir == nil then
-    vim.notify('[linksmd] You need to go to any notebook', vim.log.levels.WARN, { render = 'minimal' })
-    return
+  M.opts.buffer = {
+    id = vim.api.nvim_get_current_buf(),
+    cursor = vim.api.nvim_win_get_cursor(0),
+    line = vim.api.nvim_get_current_line(),
+  }
+
+  _G.linksmd.flags.level = nil
+
+  local flag = nil
+  local level_flag = 1
+  local load_flag = false
+  local file_note = nil
+
+  for data_filter in M.opts.buffer.line:gmatch('%b()') do
+    if data_filter:find('#') then
+      flag = data_filter:sub(2, -2)
+
+      if flag:find('^#') then
+        if flag:find('^#$') then
+          load_flag = true
+          M.opts.resource = 'headers'
+        else
+          for kflag, vflag in pairs(M.opts.flags) do
+            if '#' .. vflag == flag then
+              load_flag = true
+              M.opts.resource = kflag
+              break
+            end
+          end
+        end
+      else
+        local pos_a, pos_b = flag:find('^.*#$')
+
+        if pos_a and pos_b then
+          file_note = flag:sub(pos_a, pos_b - 1)
+
+          if not plenary_path:new(string.format('%s/%s', root_dir, file_note)):exists() then
+            vim.notify('[linksd] No found the flag note', vim.log.levels.WARN, { render = 'minimal' })
+            return
+          end
+
+          load_flag = true
+          M.opts.resource = 'headers'
+        end
+      end
+
+      if load_flag then
+        _G.linksmd.flags.level = level_flag
+        break
+      end
+    end
+
+    level_flag = level_flag + 1
+  end
+
+  if not load_flag then
+    if M.opts.resources[resource] then
+      M.opts.resource = resource
+    else
+      M.opts.resource = 'notes'
+    end
+
+    _G.linksmd.flags.level = nil
   end
 
   if M.opts.resource == 'headers' then
-    require('linksmd.headers'):init(M.opts, root_dir, 'aqui.md'):launch()
+    if file_note == nil then
+      local full_filename = vim.api.nvim_buf_get_name(0)
+
+      file_note = string.gsub(full_filename, '^' .. root_dir .. '/', '')
+    end
+
+    require('linksmd.headers'):init(M.opts, root_dir, file_note):launch()
     return
   end
 
@@ -112,7 +159,7 @@ M.display = function(resource, display_init, follow_dir)
     vim.notify('[linksmd] You need to configure the display_init', vim.log.levels.WARN, { render = 'minimal' })
   end
 end
-vim.cmd('message clear')
+-- vim.cmd('message clear')
 -- M.setup()
 -- M.display(nil, 'nui')
 

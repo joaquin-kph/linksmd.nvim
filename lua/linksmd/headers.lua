@@ -64,6 +64,11 @@ function DisplayHeaders:launch()
 
     local opts = dropdown
 
+    if #headers == 0 then
+      vim.notify('[linksmd] The note no has headers', vim.log.levels.WARN, { render = 'minimal' })
+      return
+    end
+
     local results = headers
     local prompt = 'Establecer Filtro'
 

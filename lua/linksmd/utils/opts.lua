@@ -32,7 +32,7 @@ return {
     books = 'book',
     images = 'img',
     sounds = 'sound',
-    headers = 'head',
+    -- headers = 'head',
   },
   keymaps = {
     menu_enter = { '<cr>', '<tab>' },
