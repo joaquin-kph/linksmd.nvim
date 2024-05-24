@@ -61,10 +61,10 @@ function DisplayFinder:launch()
 
   if self.only_dirs then
     results = self.files.dirs
-    prompt = 'Buscar Directorio'
+    prompt = self.opts.custom.text.search_dir
   else
     results = self.files.files
-    prompt = 'Buscar Nota'
+    prompt = self.opts.custom.text.search_note
   end
 
   if #results == 0 then
@@ -108,7 +108,7 @@ function DisplayFinder:launch()
         map({ 'n', 'i' }, self.opts.keymaps.change_searching, function()
           require('linksmd.search'):init(self.opts, self.root_dir, self.files):launch()
         end)
-        map({ 'n', 'i' }, self.opts.keymaps.search_file, function()
+        map({ 'n', 'i' }, self.opts.keymaps.search_note, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, false):launch()
         end)
         map({ 'n', 'i' }, self.opts.keymaps.search_dir, function()

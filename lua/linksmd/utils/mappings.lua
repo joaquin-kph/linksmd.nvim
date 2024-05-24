@@ -210,8 +210,8 @@ M.change_searching = function(display, popup_tree)
   end)
 end
 
-M.search_file = function(display, popup_tree)
-  popup_tree:map('n', display.opts.keymaps.search_file, function()
+M.search_note = function(display, popup_tree)
+  popup_tree:map('n', display.opts.keymaps.search_note, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
     DisplayFinder:init(display.opts, display.root_dir, display.files, false):launch()

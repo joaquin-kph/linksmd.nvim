@@ -134,7 +134,7 @@ function DisplayNui:launch()
   mappings.switch_preview(self, layout, menu_tree, popup_tree, popup_preview)
   mappings.scroll_up(self, popup_tree, popup_preview)
   mappings.scroll_down(self, popup_tree, popup_preview)
-  mappings.search_file(self, popup_tree)
+  mappings.search_note(self, popup_tree)
   mappings.search_dir(self, popup_tree)
   mappings.change_searching(self, popup_tree)
 

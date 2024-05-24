@@ -6,6 +6,10 @@ return {
     text = {
       preview = nil,
       menu = 'Notas',
+      headers = 'Titulos',
+      search_note = 'Buscar Archivo',
+      search_dir = 'Buscar Directorio',
+      change_searching = 'Nueva Busqueda',
     },
     icons = {
       directory = '',
@@ -13,26 +17,27 @@ return {
       books = '',
       images = '',
       sounds = '󰎇',
+      headers = '󰐣',
     },
   },
   dir_resources = {
     books = '/books',
     images = '/images',
-    sounds = '/sounds',
+    -- sounds = '/sounds',
   },
   resources = {
     notes = { 'md', 'rmd' },
     books = { 'pdf' },
     images = { 'png', 'jpg', 'jpeg' },
     sounds = { 'mp3' },
-    headers = {},
+    headers = {}, -- No renombrar para no causar posibles conflictos
   },
   flags = {
     notes = 'note',
     books = 'book',
     images = 'img',
     sounds = 'sound',
-    headers = '',
+    headers = '', -- No renombrar para no causar posibles conflictos
   },
   keymaps = {
     menu_enter = { '<cr>', '<tab>' },
@@ -42,7 +47,7 @@ return {
     scroll_preview = '<M-p>',
     scroll_preview_down = '<M-J>',
     scroll_preview_up = '<M-K>',
-    search_file = '<M-f>',
+    search_note = '<M-f>',
     search_dir = '<M-d>',
     change_searching = '<M-s>',
     switch_manager = '<M-a>',

@@ -77,7 +77,7 @@ local function launch_picker(display, opts, prompt, results)
           require('linksmd.search'):init(display.opts, display.root_dir, display.files):launch()
         end)
 
-        map({ 'n', 'i' }, display.opts.keymaps.search_file, function() end)
+        map({ 'n', 'i' }, display.opts.keymaps.search_note, function() end)
         map({ 'n', 'i' }, display.opts.keymaps.search_dir, function() end)
         map({ 'n', 'i' }, display.opts.keymaps.switch_manager, function() end)
 
@@ -124,7 +124,7 @@ function DisplayHeaders:launch()
     end
 
     local results = headers
-    local prompt = 'Establecer Filtro'
+    local prompt = string.format('%s [%s]', self.opts.custom.text.headers, self.file)
 
     launch_picker(self, opts, prompt, results)
   end)

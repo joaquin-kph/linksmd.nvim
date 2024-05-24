@@ -23,8 +23,23 @@ end
 function DisplaySearch:launch()
   local opts = dropdown
 
-  local results = vim.tbl_keys(self.opts.resources)
-  local prompt = 'Establecer Filtro'
+  local results = vim.tbl_map(function(key)
+    local icon = self.opts.custom.icons[key]
+
+    if key == 'headers' then
+      return string.format('%s  %s', icon, key)
+    else
+      local dir = self.opts.dir_resources[key]
+
+      if dir ~= nil then
+        return string.format('%s  %s [#%s] %s%s', icon, key, self.opts.flags[key], self.opts.notebook_main, dir)
+      else
+        return string.format('%s  %s [#%s]', icon, key, self.opts.flags[key])
+      end
+    end
+  end, vim.tbl_keys(self.opts.resources))
+
+  local prompt = self.opts.custom.text.change_searching
 
   pickers
     .new(opts, {
@@ -44,7 +59,14 @@ function DisplaySearch:launch()
 
           actions.close(bufnr)
 
-          self.opts.resource = selection[1]
+          local i = 1
+          for s in selection[1]:gmatch('(.-)%s') do
+            if i == 3 then
+              self.opts.resource = s
+              break
+            end
+            i = i + 1
+          end
 
           _G.linksmd.nui.tree.level = 0
           _G.linksmd.nui.tree.breadcrumb = {}
@@ -63,7 +85,7 @@ function DisplaySearch:launch()
         end)
 
         map({ 'n', 'i' }, self.opts.keymaps.change_searching, function() end)
-        map({ 'n', 'i' }, self.opts.keymaps.search_file, function()
+        map({ 'n', 'i' }, self.opts.keymaps.search_note, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, false):launch()
         end)
         map({ 'n', 'i' }, self.opts.keymaps.search_dir, function()
