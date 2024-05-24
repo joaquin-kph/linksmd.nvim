@@ -23,8 +23,14 @@ local function get_file_note(display)
       if pos_a and pos_b then
         file_note = data_filter:sub(pos_a, pos_b - 1)
 
+        if not file_note or file_note == '' then
+          file_note = nil
+          break
+        end
+
         if not plenary_path:new(string.format('%s/%s', display.root_dir, file_note)):exists() then
           file_note = nil
+          break
         end
       end
       break
