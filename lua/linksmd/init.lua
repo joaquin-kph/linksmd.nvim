@@ -6,6 +6,11 @@ local M = {}
 
 local function clear_globals()
   _G.linksmd = {
+    buffer = {
+      id = nil,
+      cursor = nil,
+      line = nil,
+    },
     flags = {
       pos = nil,
     },
@@ -75,11 +80,9 @@ M.display = function(resource, display_init, follow_dir)
     end
   end
 
-  M.opts.buffer = {
-    id = vim.api.nvim_get_current_buf(),
-    cursor = vim.api.nvim_win_get_cursor(0),
-    line = vim.api.nvim_get_current_line(),
-  }
+  _G.linksmd.buffer.id = vim.api.nvim_get_current_buf()
+  _G.linksmd.buffer.cursor = vim.api.nvim_win_get_cursor(0)
+  _G.linksmd.buffer.line = vim.api.nvim_get_current_line()
 
   _G.linksmd.flags.level = nil
 
@@ -88,7 +91,9 @@ M.display = function(resource, display_init, follow_dir)
   local load_flag = false
   local file_note = nil
 
-  for data_filter in M.opts.buffer.line:gmatch('%b()') do
+  local buffer = _G.linksmd.buffer
+
+  for data_filter in buffer.line:gmatch('%b()') do
     if data_filter:find('#') then
       flag = data_filter:sub(2, -2)
 
@@ -147,7 +152,7 @@ M.display = function(resource, display_init, follow_dir)
       file_note = string.gsub(full_filename, '^' .. root_dir .. '/', '')
     end
 
-    require('linksmd.headers'):init(M.opts, root_dir, file_note):launch()
+    require('linksmd.headers'):init(M.opts, root_dir, {}, file_note):launch()
     return
   end
 

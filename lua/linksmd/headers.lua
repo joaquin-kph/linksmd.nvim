@@ -6,6 +6,41 @@ local action_state = require('telescope.actions.state')
 local dropdown = require('telescope.themes').get_dropdown()
 local node = require('linksmd.utils.node')
 local ufiles = require('linksmd.utils.files')
+local plenary_path = require('plenary.path')
+
+local function get_file_note(display)
+  local file_note = nil
+  local buffer = _G.linksmd.buffer
+
+  local level = 1
+
+  for data_filter in buffer.line:gmatch('%b()') do
+    if level == _G.linksmd.flags.level then
+      data_filter = data_filter:sub(2, -2)
+
+      local pos_a, pos_b = data_filter:find('^.*#$')
+
+      if pos_a and pos_b then
+        file_note = data_filter:sub(pos_a, pos_b - 1)
+
+        if not plenary_path:new(string.format('%s/%s', display.root_dir, file_note)):exists() then
+          file_note = nil
+        end
+      end
+      break
+    end
+
+    level = level + 1
+  end
+
+  if file_note == nil then
+    local full_filename = vim.api.nvim_buf_get_name(0)
+
+    file_note = string.gsub(full_filename, '^' .. display.root_dir .. '/', '')
+  end
+
+  return file_note
+end
 
 local function launch_picker(display, opts, prompt, results)
   pickers
@@ -29,8 +64,16 @@ local function launch_picker(display, opts, prompt, results)
           local header = '#'
             .. selection[1]:lower():gsub('[^%a%s%d%-_]', ''):gsub('^ *', ''):gsub(' ', '-'):gsub('%-%-', '-')
 
-          ufiles.apply_file(display.opts, header)
+          ufiles.apply_file(header)
         end)
+
+        map('i', display.opts.keymaps.change_searching, function()
+          require('linksmd.search'):init(display.opts, display.root_dir, display.files):launch()
+        end)
+
+        map({ 'n', 'i' }, display.opts.keymaps.search_file, function() end)
+        map({ 'n', 'i' }, display.opts.keymaps.search_dir, function() end)
+        map({ 'n', 'i' }, display.opts.keymaps.switch_manager, function() end)
 
         return true
       end,
@@ -41,12 +84,17 @@ end
 local DisplayHeaders = {}
 DisplayHeaders.__index = DisplayHeaders
 
-function DisplayHeaders:init(opts, root_dir, file)
+function DisplayHeaders:init(opts, root_dir, files, file)
   local data = {
     opts = opts,
     root_dir = root_dir,
+    files = files,
     file = file,
   }
+
+  if file == nil then
+    data.file = get_file_note(data)
+  end
 
   setmetatable(data, DisplayHeaders)
 

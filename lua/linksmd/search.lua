@@ -50,6 +50,11 @@ function DisplaySearch:launch()
           _G.linksmd.nui.tree.breadcrumb = {}
           _G.linksmd.nui.tree.parent_files = {}
 
+          if self.opts.resource == 'headers' then
+            require('linksmd.headers'):init(self.opts, self.root_dir, self.files, nil):launch()
+            return
+          end
+
           if self.opts.display_init == 'nui' then
             require('linksmd.manager'):init(self.opts, self.root_dir, nil, {}):launch()
           elseif self.opts.display_init == 'telescope' then
@@ -57,14 +62,14 @@ function DisplaySearch:launch()
           end
         end)
 
-        map('i', self.opts.keymaps.search_file, function()
+        map({ 'n', 'i' }, self.opts.keymaps.change_searching, function() end)
+        map({ 'n', 'i' }, self.opts.keymaps.search_file, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, false):launch()
         end)
-        map('i', self.opts.keymaps.search_dir, function()
+        map({ 'n', 'i' }, self.opts.keymaps.search_dir, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, true):launch()
         end)
-        map('i', self.opts.keymaps.change_searching)
-        map('i', self.opts.keymaps.switch_manager, function()
+        map({ 'n', 'i' }, self.opts.keymaps.switch_manager, function()
           actions.close(bufnr)
 
           local follow_dir = table.concat(_G.linksmd.nui.tree.breadcrumb, '/')

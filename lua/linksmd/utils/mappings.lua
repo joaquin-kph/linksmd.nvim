@@ -39,7 +39,7 @@ M.enter = function(display, tree, popup_tree, popup_preview)
 
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('gg', true, false, true), 'n', true)
     else
-      ufiles.apply_file(display.opts, node.file)
+      ufiles.apply_file(node.file)
       popup_tree:unmount()
     end
   end)
@@ -202,6 +202,14 @@ M.menu_up = function(display, tree, popup_tree, popup_preview)
   end)
 end
 
+M.change_searching = function(display, popup_tree)
+  popup_tree:map('n', display.opts.keymaps.change_searching, function()
+    vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
+
+    DisplaySearch:init(display.opts, display.root_dir, display.files):launch()
+  end)
+end
+
 M.search_file = function(display, popup_tree)
   popup_tree:map('n', display.opts.keymaps.search_file, function()
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
@@ -215,14 +223,6 @@ M.search_dir = function(display, popup_tree)
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
     DisplayFinder:init(display.opts, display.root_dir, display.files, true):launch()
-  end)
-end
-
-M.change_searching = function(display, popup_tree)
-  popup_tree:map('n', display.opts.keymaps.change_searching, function()
-    vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
-
-    DisplaySearch:init(display.opts, display.root_dir, display.files):launch()
   end)
 end
 

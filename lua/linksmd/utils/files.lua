@@ -119,26 +119,28 @@ local replace_line = function(line, regex, replace, n_ocurrence)
   return line
 end
 
-M.apply_file = function(opts, file)
+M.apply_file = function(file)
   local link_line = nil
   local cursor_col_start = nil
   local cursor_col_end = nil
 
+  local buffer = _G.linksmd.buffer
+
   if _G.linksmd.flags.level then
-    link_line = replace_line(opts.buffer.line, '%b()', string.format('(%s)', file), _G.linksmd.flags.level)
+    link_line = replace_line(buffer.line, '%b()', string.format('(%s)', file), _G.linksmd.flags.level)
     cursor_col_start = 0
-    cursor_col_end = opts.buffer.line:len()
+    cursor_col_end = buffer.line:len()
   else
     link_line = file
-    cursor_col_start = opts.buffer.cursor[2]
-    cursor_col_end = opts.buffer.cursor[2]
+    cursor_col_start = buffer.cursor[2]
+    cursor_col_end = buffer.cursor[2]
   end
 
   vim.api.nvim_buf_set_text(
-    opts.buffer.id,
-    opts.buffer.cursor[1] - 1,
+    buffer.id,
+    buffer.cursor[1] - 1,
     cursor_col_start,
-    opts.buffer.cursor[1] - 1,
+    buffer.cursor[1] - 1,
     cursor_col_end,
     { link_line }
   )
