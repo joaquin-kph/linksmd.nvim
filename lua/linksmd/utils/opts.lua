@@ -4,12 +4,13 @@ return {
   display_init = 'nui',
   custom = {
     text = {
-      preview = nil,
+      preview = 'Preview',
       menu = 'Notas',
       headers = 'Titulos',
       search_note = 'Buscar Archivo',
       search_dir = 'Buscar Directorio',
       change_searching = 'Nueva Busqueda',
+      helper = 'Ayuda',
     },
     icons = {
       directory = '',
@@ -51,5 +52,7 @@ return {
     search_dir = '<M-d>',
     change_searching = '<M-s>',
     switch_manager = '<M-a>',
+    helper = '?',
+    helper_quit = { '<esc>', '<M-q>' },
   },
 }

@@ -138,9 +138,26 @@ function DisplayNui:launch()
   mappings.search_dir(self, popup_tree)
   mappings.change_searching(self, popup_tree)
 
+  local popup_helper = components.popup(true, false, self.opts.custom.text.helper, {
+    modifiable = false,
+    readonly = true,
+  })
+  ufiles.read_helper(popup_helper.bufnr, self.opts.keymaps, self.opts.flags)
+
+  mappings.display_helper(self, layout, popup_tree, popup_preview, popup_helper)
+
   popup_tree:on(event.BufLeave, function()
     popup_preview:unmount()
     popup_tree:unmount()
+    popup_helper:unmount()
+  end)
+
+  popup_helper:on(event.BufLeave, function()
+    if not _G.linksmd.nui.helper_quit then
+      popup_preview:unmount()
+      popup_tree:unmount()
+      popup_helper:unmount()
+    end
   end)
 end
 

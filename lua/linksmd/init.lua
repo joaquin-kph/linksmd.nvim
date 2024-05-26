@@ -15,6 +15,7 @@ local function clear_globals()
       pos = nil,
     },
     nui = {
+      helper_quit = false,
       tree = {
         level = 0,
         parent_files = {},

@@ -226,4 +226,26 @@ M.search_dir = function(display, popup_tree)
   end)
 end
 
+M.display_helper = function(display, layout, popup_tree, popup_preview, popup_helper)
+  popup_tree:map('n', display.opts.keymaps.helper, function()
+    _G.linksmd.nui.helper_quit = false
+
+    layout:update(Layout.Box({
+      Layout.Box(popup_helper, { size = '60%' }),
+      Layout.Box(popup_tree, { size = '40%' }),
+    }, { dir = 'col' }))
+  end)
+
+  popup_helper:map('n', display.opts.keymaps.helper_quit, function()
+    _G.linksmd.nui.helper_quit = true
+
+    vim.api.nvim_set_current_win(popup_tree.winid)
+
+    layout:update(Layout.Box({
+      Layout.Box(popup_preview, { size = '60%' }),
+      Layout.Box(popup_tree, { size = '40%' }),
+    }, { dir = 'col' }))
+  end)
+end
+
 return M

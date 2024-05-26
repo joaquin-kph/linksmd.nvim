@@ -6,10 +6,16 @@ local ufiles = require('linksmd.utils.files')
 
 local M = {}
 
-M.popup = function(enter, focusable, title)
+M.popup = function(enter, focusable, title, buf_options)
+  buf_options = buf_options or {
+    modifiable = true,
+    readonly = false,
+  }
+
   return Popup({
     enter = enter,
     focusable = focusable,
+    buf_options = buf_options,
     border = {
       style = 'single',
       text = {

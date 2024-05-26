@@ -83,6 +83,92 @@ M.read_file = function(path)
   return data
 end
 
+M.read_helper = function(bufnr_helper, keymaps, flags)
+  local function treat_data(data)
+    local keys_len = 10
+    local new_data = data
+
+    if #data < keys_len then
+      for _ = 1, keys_len - #data do
+        new_data = new_data .. ' '
+      end
+    end
+
+    return new_data
+  end
+
+  local lines = {}
+
+  local lines_flags = {
+    ' Available flags',
+    '-------------------------------------------------------',
+  }
+  for _, v in ipairs(lines_flags) do
+    table.insert(lines, v:upper())
+  end
+
+  local the_flags = {
+    notes = 'Get a note',
+    books = 'Get a book',
+    images = 'Get an image',
+    sounds = 'Get a sound',
+    headers = 'Get a header',
+  }
+
+  for k, v in pairs(flags) do
+    local flag = the_flags[k] or nil
+
+    if flag ~= nil then
+      table.insert(lines, string.format(' %s %s', treat_data('#' .. v), flag))
+    end
+  end
+
+  local lines_keymaps = {
+    '',
+    ' List of all keymaps',
+    '-------------------------------------------------------',
+  }
+
+  for _, v in ipairs(lines_keymaps) do
+    table.insert(lines, v:upper())
+  end
+
+  local actions = {
+    menu_enter = 'Open directory',
+    menu_back = 'Go to back',
+    menu_down = 'Move to down [menu]',
+    menu_up = 'Move to up [menu]',
+    scroll_preview_down = 'Scroll down [preview]',
+    scroll_preview_up = 'Scroll up [preview]',
+    search_note = 'Searching note [telescope]',
+    search_dir = 'Searching directory [telescope]',
+    change_searching = 'Switch of links [telescope]',
+    switch_manager = 'Menu nodes [Only works in telescope]',
+    helper = 'Show helper [Only works in menu]',
+    helper_quit = 'Exit from helper',
+  }
+
+  for k, v in pairs(keymaps) do
+    local action = actions[k] or nil
+
+    if action ~= nil then
+      if type(v) == 'table' then
+        for i, v2 in ipairs(v) do
+          if i == 1 then
+            table.insert(lines, string.format(' %s %s', treat_data(v2), action))
+          else
+            table.insert(lines, string.format('  └╴%s', treat_data(v2)))
+          end
+        end
+      else
+        table.insert(lines, string.format(' %s %s', treat_data(v), action))
+      end
+    end
+  end
+
+  vim.api.nvim_buf_set_lines(bufnr_helper, 0, -1, false, lines)
+end
+
 local replace_line = function(line, regex, replace, n_ocurrence)
   local pos_a, pos_b = 1, 0
   local middle_flag = false
