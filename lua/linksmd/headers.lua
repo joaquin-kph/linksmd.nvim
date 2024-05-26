@@ -43,6 +43,10 @@ local function get_file_note(display)
     local full_filename = vim.api.nvim_buf_get_name(0)
 
     file_note = string.gsub(full_filename, '^' .. display.root_dir .. '/', '')
+
+    if full_filename == file_note then
+      print('IGUALES')
+    end
   end
 
   return file_note
@@ -77,8 +81,14 @@ local function launch_picker(display, opts, prompt, results)
           require('linksmd.search'):init(display.opts, display.root_dir, display.files):launch()
         end)
 
+        map({ 'n', 'i' }, display.opts.keymaps.change_notebooks, function()
+          require('linksmd.notebooks'):init(display.opts, display.root_dir, display.files):launch()
+        end)
+
         map({ 'n', 'i' }, display.opts.keymaps.search_note, function() end)
+
         map({ 'n', 'i' }, display.opts.keymaps.search_dir, function() end)
+
         map({ 'n', 'i' }, display.opts.keymaps.switch_manager, function() end)
 
         return true

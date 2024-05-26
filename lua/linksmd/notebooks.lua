@@ -4,42 +4,35 @@ local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local dropdown = require('telescope.themes').get_dropdown()
+local plenary_path = require('plenary.path')
 
-local DisplaySearch = {}
-DisplaySearch.__index = DisplaySearch
+local DisplayNotebooks = {}
+DisplayNotebooks.__index = DisplayNotebooks
 
-function DisplaySearch:init(opts, root_dir, files)
+function DisplayNotebooks:init(opts, root_dir, files)
   local data = {
     opts = opts,
     root_dir = root_dir,
     files = files,
   }
 
-  setmetatable(data, DisplaySearch)
+  setmetatable(data, DisplayNotebooks)
 
   return data
 end
 
-function DisplaySearch:launch()
+function DisplayNotebooks:launch()
   local opts = dropdown
 
-  local results = vim.tbl_map(function(key)
-    local icon = self.opts.custom.icons[key]
+  local results = vim.tbl_map(function(notebook)
+    local icon = notebook.icon
+    local title = notebook.title
+    local path = notebook.path
 
-    if key == 'headers' then
-      return string.format('%s  %s ', icon, key)
-    else
-      local dir = self.opts.dir_resources[key]
+    return string.format('%s  %s %s', icon, title, path)
+  end, self.opts.notebooks)
 
-      if dir ~= nil then
-        return string.format('%s  %s [#%s] %s%s', icon, key, self.opts.flags[key], self.root_dir, dir)
-      else
-        return string.format('%s  %s [#%s]', icon, key, self.opts.flags[key])
-      end
-    end
-  end, vim.tbl_keys(self.opts.resources))
-
-  local prompt = self.opts.custom.text.change_searching
+  local prompt = self.opts.custom.text.notebooks
 
   pickers
     .new(opts, {
@@ -59,23 +52,35 @@ function DisplaySearch:launch()
 
           actions.close(bufnr)
 
+          local notebook = nil
+
           local i = 1
           for s in selection[1]:gmatch('(.-)%s') do
             if i == 3 then
-              self.opts.resource = s
+              notebook = s
               break
             end
             i = i + 1
           end
 
-          _G.linksmd.nui.tree.level = 0
-          _G.linksmd.nui.tree.breadcrumb = {}
-          _G.linksmd.nui.tree.parent_files = {}
+          self.root_dir = vim.tbl_filter(function(n)
+            if n.title == notebook then
+              return true
+            end
 
-          if self.opts.resource == 'headers' then
-            require('linksmd.headers'):init(self.opts, self.root_dir, self.files, nil):launch()
+            return false
+          end, self.opts.notebooks)[1].path
+
+          if not plenary_path:new(self.root_dir):exists() then
+            vim.notify(
+              string.format('[linksmd] No found the notebook (%s)', self.root_dir),
+              vim.log.levels.WARN,
+              { render = 'minimal' }
+            )
             return
           end
+
+          self.opts.resource = 'notes'
 
           if self.opts.display_init == 'nui' then
             require('linksmd.manager'):init(self.opts, self.root_dir, nil, {}):launch()
@@ -84,10 +89,10 @@ function DisplaySearch:launch()
           end
         end)
 
-        map({ 'n', 'i' }, self.opts.keymaps.change_searching, function() end)
+        map({ 'n', 'i' }, self.opts.keymaps.change_notebooks, function() end)
 
-        map({ 'n', 'i' }, self.opts.keymaps.change_notebooks, function()
-          require('linksmd.notebooks'):init(self.opts, self.root_dir, self.files):launch()
+        map({ 'n', 'i' }, self.opts.keymaps.change_searching, function()
+          require('linksmd.search'):init(self.opts, self.root_dir, self.files):launch()
         end)
 
         map({ 'n', 'i' }, self.opts.keymaps.search_note, function()
@@ -114,4 +119,4 @@ function DisplaySearch:launch()
     :find()
 end
 
-return DisplaySearch
+return DisplayNotebooks

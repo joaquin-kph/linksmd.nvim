@@ -104,12 +104,13 @@ M.node_files = function(file, parts, node, aux_ids)
 end
 
 M.preview_data = function(root_dir, item, callback)
+  print('ROOT', root_dir, 'FILE', item)
   if item == nil then
     return
   end
 
   local path = string.format('%s/%s', root_dir, item)
-
+  print('PATH', path)
   plenary_async.run(function()
     local data = ufiles.read_file(path)
     local text = vim.split(data and data or '', '\n')

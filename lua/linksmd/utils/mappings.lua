@@ -2,6 +2,7 @@ local Layout = require('nui.layout')
 local ufiles = require('linksmd.utils.files')
 local DisplayFinder = require('linksmd.finder')
 local DisplaySearch = require('linksmd.search')
+local DisplayNotebooks = require('linksmd.notebooks')
 local unode = require('linksmd.utils.node')
 
 local M = {}
@@ -207,6 +208,14 @@ M.change_searching = function(display, popup_tree)
     vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
 
     DisplaySearch:init(display.opts, display.root_dir, display.files):launch()
+  end)
+end
+
+M.change_notebook = function(display, popup_tree)
+  popup_tree:map('n', display.opts.keymaps.change_notebooks, function()
+    vim.api.nvim_buf_delete(popup_tree.bufnr, { force = true })
+
+    DisplayNotebooks:init(display.opts, display.root_dir, display.files):launch()
   end)
 end
 

@@ -105,15 +105,22 @@ function DisplayFinder:launch()
           end
         end)
 
+        map({ 'n', 'i' }, self.opts.keymaps.change_notebooks, function()
+          require('linksmd.notebooks'):init(self.opts, self.root_dir, self.files):launch()
+        end)
+
         map({ 'n', 'i' }, self.opts.keymaps.change_searching, function()
           require('linksmd.search'):init(self.opts, self.root_dir, self.files):launch()
         end)
+
         map({ 'n', 'i' }, self.opts.keymaps.search_note, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, false):launch()
         end)
+
         map({ 'n', 'i' }, self.opts.keymaps.search_dir, function()
           require('linksmd.finder'):init(self.opts, self.root_dir, self.files, true):launch()
         end)
+
         map({ 'n', 'i' }, self.opts.keymaps.switch_manager, function()
           actions.close(bufnr)
 

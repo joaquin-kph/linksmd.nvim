@@ -62,7 +62,7 @@ function DisplayNui:launch()
 
   if #nodes == 0 then
     vim.notify(
-      string.format('[linksmd] No found %s in this notebook (%s)', self.opts.resource, self.opts.notebook_main),
+      string.format('[linksmd] No found %s in this notebook (%s)', self.opts.resource, self.root_dir),
       vim.log.levels.WARN,
       { render = 'minimal' }
     )
@@ -73,7 +73,7 @@ function DisplayNui:launch()
   local popup_tree = components.popup(true, true, self.opts.custom.text.menu)
   local menu_tree = components.tree(popup_tree.bufnr)
 
-  popup_tree.border:set_text('bottom', string.format(' Notebook: %s ', self.opts.notebook_main), 'right')
+  popup_tree.border:set_text('bottom', string.format(' Notebook: %s ', self.root_dir), 'right')
 
   local boxes = nil
   if self.opts.resource == 'notes' then
@@ -138,6 +138,7 @@ function DisplayNui:launch()
   mappings.search_note(self, popup_tree)
   mappings.search_dir(self, popup_tree)
   mappings.change_searching(self, popup_tree)
+  mappings.change_notebook(self, popup_tree)
 
   local popup_helper = components.popup(true, false, self.opts.custom.text.helper, {
     modifiable = false,

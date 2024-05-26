@@ -55,17 +55,17 @@ M.display = function(resource, display_init, follow_dir)
   local root_dir = nil
   follow_dir = follow_dir or nil
 
-  if M.opts.notebook_main ~= nil then
-    if not plenary_path:new(M.opts.notebook_main):exists() then
+  if #M.opts.notebooks > 0 then
+    if not plenary_path:new(M.opts.notebooks[1].path):exists() then
       vim.notify(
-        '[linksmd] You need to pass a correct notebook_main or nil',
+        string.format('[linksmd] No found the first notebook (%s)', M.opts.notebooks[1].path),
         vim.log.levels.WARN,
         { render = 'minimal' }
       )
       return
     end
 
-    root_dir = M.opts.notebook_main
+    root_dir = M.opts.notebooks[1].path
   else
     root_dir = ufiles.get_root_dir()
   end

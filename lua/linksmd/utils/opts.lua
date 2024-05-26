@@ -1,5 +1,26 @@
 return {
-  notebook_main = vim.fn.expand('~') .. '/test',
+  notebooks = {
+    {
+      path = vim.fn.expand('~') .. '/documentos/notas/personal',
+      title = 'Principal',
+      icon = '',
+    },
+    {
+      path = vim.fn.expand('~') .. '/test/vault',
+      title = 'Secundario',
+      icon = '',
+    },
+    {
+      path = vim.fn.expand('~') .. '/test/vault2',
+      title = 'Terciario',
+      icon = '',
+    },
+    {
+      path = vim.fn.expand('~') .. '/test',
+      title = 'Test',
+      icon = '',
+    },
+  },
   resource = 'notes',
   display_init = 'nui',
   custom = {
@@ -11,6 +32,7 @@ return {
       search_dir = 'Buscar Directorio',
       change_searching = 'Nueva Busqueda',
       helper = 'Ayuda',
+      notebooks = 'Cuadernos',
     },
     icons = {
       directory = '',
@@ -51,6 +73,7 @@ return {
     search_note = '<M-f>',
     search_dir = '<M-d>',
     change_searching = '<M-s>',
+    change_notebooks = '<M-z>',
     switch_manager = '<M-a>',
     helper = '?',
     helper_quit = { '<esc>', '<M-q>' },
