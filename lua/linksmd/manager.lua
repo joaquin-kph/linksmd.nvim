@@ -124,6 +124,7 @@ function DisplayNui:launch()
 
   layout:mount()
   menu_tree:render()
+  _G.linksmd.nui.tree.winid = popup_tree.winid
 
   vim.api.nvim_command('stopinsert')
 
@@ -150,6 +151,7 @@ function DisplayNui:launch()
     popup_preview:unmount()
     popup_tree:unmount()
     popup_helper:unmount()
+    _G.linksmd.nui.tree.winid = nil
   end)
 
   popup_helper:on(event.BufLeave, function()
@@ -157,6 +159,7 @@ function DisplayNui:launch()
       popup_preview:unmount()
       popup_tree:unmount()
       popup_helper:unmount()
+      _G.linksmd.nui.tree.winid = nil
     end
   end)
 end

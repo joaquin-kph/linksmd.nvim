@@ -27,7 +27,7 @@ function DisplaySearch:launch()
     local icon = self.opts.custom.icons[key]
 
     if key == 'headers' then
-      return string.format('%s  %s', icon, key)
+      return string.format('%s  %s ', icon, key)
     else
       local dir = self.opts.dir_resources[key]
 

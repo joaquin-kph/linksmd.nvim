@@ -17,6 +17,7 @@ local function clear_globals()
     nui = {
       helper_quit = false,
       tree = {
+        winid = nil,
         level = 0,
         parent_files = {},
         breadcrumb = {},
@@ -39,6 +40,11 @@ end
 
 M.display = function(resource, display_init, follow_dir)
   vim.cmd('messages clear')
+
+  if _G.linksmd.nui.tree.winid then
+    vim.notify('[linksmd] You have an active operation', vim.log.levels.WARN, { render = 'minimal' })
+    return
+  end
 
   clear_globals()
 

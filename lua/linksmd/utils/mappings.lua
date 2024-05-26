@@ -241,10 +241,16 @@ M.display_helper = function(display, layout, popup_tree, popup_preview, popup_he
 
     vim.api.nvim_set_current_win(popup_tree.winid)
 
-    layout:update(Layout.Box({
-      Layout.Box(popup_preview, { size = '60%' }),
-      Layout.Box(popup_tree, { size = '40%' }),
-    }, { dir = 'col' }))
+    if display.opts.resource == 'notes' then
+      layout:update(Layout.Box({
+        Layout.Box(popup_preview, { size = '60%' }),
+        Layout.Box(popup_tree, { size = '40%' }),
+      }, { dir = 'col' }))
+    else
+      layout:update(Layout.Box({
+        Layout.Box(popup_tree, { size = '100%' }),
+      }, { dir = 'col' }))
+    end
   end)
 end
 
