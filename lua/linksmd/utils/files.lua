@@ -206,6 +206,16 @@ local replace_line = function(line, regex, replace, n_ocurrence)
 end
 
 M.apply_file = function(file)
+  if _G.linksmd.notebook ~= M.get_root_dir() then
+    file = string.gsub(file, '^' .. _G.linksmd.notebook .. '/', '')
+
+    if file:find('^#') then
+      file = file
+    else
+      file = string.format('%s/%s', _G.linksmd.notebook, file)
+    end
+  end
+
   local link_line = nil
   local cursor_col_start = nil
   local cursor_col_end = nil

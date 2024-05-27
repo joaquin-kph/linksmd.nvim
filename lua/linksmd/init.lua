@@ -104,6 +104,7 @@ M.display = function(resource, display_init, follow_dir)
   local level_flag = 1
   local load_flag = false
   local file_note = nil
+  local current_notebook = true
 
   local buffer = _G.linksmd.buffer
 
@@ -130,8 +131,23 @@ M.display = function(resource, display_init, follow_dir)
         if pos_a and pos_b then
           file_note = flag:sub(pos_a, pos_b - 1)
 
-          if not plenary_path:new(string.format('%s/%s', root_dir, file_note)):exists() then
-            vim.notify('[linksd] No found the flag note', vim.log.levels.WARN, { render = 'minimal' })
+          local treat_file_note = string.gsub(file_note, '^' .. root_dir .. '/', '')
+
+          local path_headers = nil
+          if file_note == treat_file_note then
+            path_headers = file_note
+            current_notebook = false
+          else
+            file_note = treat_file_note
+            path_headers = string.format('%s/%s', root_dir, treat_file_note)
+          end
+
+          if not plenary_path:new(path_headers):exists() then
+            vim.notify(
+              string.format('[linksd] No found the flag note in this notebook (%s)', root_dir),
+              vim.log.levels.WARN,
+              { render = 'minimal' }
+            )
             return
           end
 
@@ -160,8 +176,6 @@ M.display = function(resource, display_init, follow_dir)
   end
 
   if M.opts.resource == 'headers' then
-    local current_notebook = true
-
     if file_note == nil then
       local full_filename = vim.api.nvim_buf_get_name(0)
 
