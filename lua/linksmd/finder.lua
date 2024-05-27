@@ -4,6 +4,7 @@ local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local previewers = require('telescope.previewers')
+local layout_actions = require('telescope.actions.layout')
 local ufiles = require('linksmd.utils.files')
 local unode = require('linksmd.utils.node')
 
@@ -82,12 +83,16 @@ function DisplayFinder:launch()
       previewer = self.open_preview == true and previewers.new_buffer_previewer({
         ---@diagnostic disable-next-line: redefined-local
         define_preview = function(self, entry, _)
-          unode.preview_data(root_dir, entry[1], function(text)
+          unode.preview_data(root_dir, entry[1], true, function(text)
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, text)
           end)
         end,
       }),
       attach_mappings = function(bufnr, map)
+        if not self.opts.preview_default then
+          layout_actions.toggle_preview(bufnr)
+        end
+
         actions.select_default:replace(function()
           local selection = action_state.get_selected_entry()
 

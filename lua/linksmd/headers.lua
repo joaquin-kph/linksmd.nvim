@@ -10,6 +10,7 @@ local plenary_path = require('plenary.path')
 
 local function get_file_note(display)
   local file_note = nil
+  local file_current_notebook = true
   local buffer = _G.linksmd.buffer
 
   local level = 1
@@ -45,11 +46,11 @@ local function get_file_note(display)
     file_note = string.gsub(full_filename, '^' .. display.root_dir .. '/', '')
 
     if full_filename == file_note then
-      print('IGUALES')
+      file_current_notebook = false
     end
   end
 
-  return file_note
+  return file_note, file_current_notebook
 end
 
 local function launch_picker(display, opts, prompt, results)
@@ -106,10 +107,11 @@ function DisplayHeaders:init(opts, root_dir, files, file)
     root_dir = root_dir,
     files = files,
     file = file,
+    file_current_notebook = true,
   }
 
   if file == nil then
-    data.file = get_file_note(data)
+    data.file, data.file_current_notebook = get_file_note(data)
   end
 
   setmetatable(data, DisplayHeaders)
@@ -118,7 +120,7 @@ function DisplayHeaders:init(opts, root_dir, files, file)
 end
 
 function DisplayHeaders:launch()
-  node.preview_data(self.root_dir, self.file, function(text)
+  node.preview_data(self.root_dir, self.file, self.file_current_notebook, function(text)
     local headers = vim.tbl_filter(function(line)
       if line:match('^#+%s+') then
         return true

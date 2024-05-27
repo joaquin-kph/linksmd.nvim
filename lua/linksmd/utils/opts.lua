@@ -23,6 +23,7 @@ return {
   },
   resource = 'notes',
   display_init = 'nui',
+  preview_default = false,
   custom = {
     text = {
       preview = 'Preview',

@@ -6,6 +6,7 @@ local M = {}
 
 local function clear_globals()
   _G.linksmd = {
+    notebook = nil,
     buffer = {
       id = nil,
       cursor = nil,
@@ -46,8 +47,6 @@ M.display = function(resource, display_init, follow_dir)
     return
   end
 
-  clear_globals()
-
   if display_init ~= nil and display_init ~= '' and (display_init == 'telescope' or display_init == 'nui') then
     M.opts.display_init = display_init
   end
@@ -55,25 +54,33 @@ M.display = function(resource, display_init, follow_dir)
   local root_dir = nil
   follow_dir = follow_dir or nil
 
-  if #M.opts.notebooks > 0 then
-    if not plenary_path:new(M.opts.notebooks[1].path):exists() then
-      vim.notify(
-        string.format('[linksmd] No found the first notebook (%s)', M.opts.notebooks[1].path),
-        vim.log.levels.WARN,
-        { render = 'minimal' }
-      )
-      return
-    end
-
-    root_dir = M.opts.notebooks[1].path
+  if _G.linksmd.notebook ~= nil then
+    root_dir = _G.linksmd.notebook
   else
-    root_dir = ufiles.get_root_dir()
+    if #M.opts.notebooks > 0 then
+      if not plenary_path:new(M.opts.notebooks[1].path):exists() then
+        vim.notify(
+          string.format('[linksmd] No found the first notebook (%s)', M.opts.notebooks[1].path),
+          vim.log.levels.WARN,
+          { render = 'minimal' }
+        )
+        return
+      end
+
+      root_dir = M.opts.notebooks[1].path
+    else
+      root_dir = ufiles.get_root_dir()
+    end
   end
 
   if root_dir == nil then
     vim.notify('[linksmd] You need to go to any notebook', vim.log.levels.WARN, { render = 'minimal' })
     return
   end
+
+  clear_globals()
+
+  _G.linksmd.notebook = root_dir
 
   if follow_dir ~= nil then
     if not plenary_path:new(follow_dir):exists() then

@@ -17,7 +17,7 @@ function DisplayNui:init(opts, root_dir, follow_dir, files)
     root_dir = root_dir,
     opts = opts,
     preview = {
-      state = true,
+      state = opts.preview_default,
     },
     files = nil,
     follow_dir = follow_dir,
@@ -77,10 +77,16 @@ function DisplayNui:launch()
 
   local boxes = nil
   if self.opts.resource == 'notes' then
-    boxes = Layout.Box({
-      Layout.Box(popup_preview, { size = '60%' }),
-      Layout.Box(popup_tree, { size = '40%' }),
-    }, { dir = 'col' })
+    if self.preview.state then
+      boxes = Layout.Box({
+        Layout.Box(popup_preview, { size = '60%' }),
+        Layout.Box(popup_tree, { size = '40%' }),
+      }, { dir = 'col' })
+    else
+      boxes = Layout.Box({
+        Layout.Box(popup_tree, { size = '100%' }),
+      }, { dir = 'col' })
+    end
   else
     boxes = Layout.Box({
       Layout.Box(popup_tree, { size = '100%' }),

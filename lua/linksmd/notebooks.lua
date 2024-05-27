@@ -71,6 +71,8 @@ function DisplayNotebooks:launch()
             return false
           end, self.opts.notebooks)[1].path
 
+          _G.linksmd.notebook = self.root_dir
+
           if not plenary_path:new(self.root_dir):exists() then
             vim.notify(
               string.format('[linksmd] No found the notebook (%s)', self.root_dir),

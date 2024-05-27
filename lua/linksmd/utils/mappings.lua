@@ -21,7 +21,7 @@ M.enter = function(display, tree, popup_tree, popup_preview)
       tree:render()
 
       if not node.children[1].children then
-        unode.preview_data(display.root_dir, node.children[1].file, function(text)
+        unode.preview_data(display.root_dir, node.children[1].file, true, function(text)
           vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
 
           vim.api.nvim_buf_call(popup_preview.bufnr, function()
@@ -126,7 +126,7 @@ M.switch_preview = function(display, layout, tree, popup_tree, popup_preview)
         Layout.Box(popup_tree, { size = '40%' }),
       }, { dir = 'col' }))
 
-      unode.preview_data(display.root_dir, tree:get_node().file, function(text)
+      unode.preview_data(display.root_dir, tree:get_node().file, true, function(text)
         vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
 
         vim.api.nvim_buf_call(popup_preview.bufnr, function()
@@ -156,7 +156,7 @@ M.menu_down = function(display, tree, popup_tree, popup_preview)
       file = tree:get_nodes()[item_pos].file
 
       if file ~= nil then
-        unode.preview_data(display.root_dir, file, function(text)
+        unode.preview_data(display.root_dir, file, true, function(text)
           vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
 
           vim.api.nvim_buf_call(popup_preview.bufnr, function()
@@ -187,7 +187,7 @@ M.menu_up = function(display, tree, popup_tree, popup_preview)
       file = tree:get_nodes()[item_pos].file
 
       if file ~= nil then
-        unode.preview_data(display.root_dir, file, function(text)
+        unode.preview_data(display.root_dir, file, true, function(text)
           vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
 
           vim.api.nvim_buf_call(popup_preview.bufnr, function()
@@ -251,10 +251,16 @@ M.display_helper = function(display, layout, popup_tree, popup_preview, popup_he
     vim.api.nvim_set_current_win(popup_tree.winid)
 
     if display.opts.resource == 'notes' then
-      layout:update(Layout.Box({
-        Layout.Box(popup_preview, { size = '60%' }),
-        Layout.Box(popup_tree, { size = '40%' }),
-      }, { dir = 'col' }))
+      if display.opts.preview_default then
+        layout:update(Layout.Box({
+          Layout.Box(popup_preview, { size = '60%' }),
+          Layout.Box(popup_tree, { size = '40%' }),
+        }, { dir = 'col' }))
+      else
+        layout:update(Layout.Box({
+          Layout.Box(popup_tree, { size = '100%' }),
+        }, { dir = 'col' }))
+      end
     else
       layout:update(Layout.Box({
         Layout.Box(popup_tree, { size = '100%' }),
