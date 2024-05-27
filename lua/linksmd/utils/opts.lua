@@ -41,12 +41,14 @@ return {
       books = '',
       images = '',
       sounds = '󰎇',
+      videos = '',
       headers = '󰐣',
     },
   },
   dir_resources = {
     books = '/books',
     images = '/images',
+    -- videos = '/videos',
     -- sounds = '/sounds',
   },
   resources = {
@@ -54,6 +56,7 @@ return {
     books = { 'pdf' },
     images = { 'png', 'jpg', 'jpeg' },
     sounds = { 'mp3' },
+    videos = { 'mp4' },
     headers = {}, -- No renombrar para no causar posibles conflictos
   },
   flags = {
@@ -61,6 +64,7 @@ return {
     books = 'book',
     images = 'img',
     sounds = 'sound',
+    videos = 'video',
     headers = '', -- No renombrar para no causar posibles conflictos
   },
   keymaps = {

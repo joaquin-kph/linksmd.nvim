@@ -160,13 +160,19 @@ M.display = function(resource, display_init, follow_dir)
   end
 
   if M.opts.resource == 'headers' then
+    local current_notebook = true
+
     if file_note == nil then
       local full_filename = vim.api.nvim_buf_get_name(0)
 
       file_note = string.gsub(full_filename, '^' .. root_dir .. '/', '')
+
+      if file_note == full_filename then
+        current_notebook = false
+      end
     end
 
-    require('linksmd.headers'):init(M.opts, root_dir, {}, file_note):launch()
+    require('linksmd.headers'):init(M.opts, root_dir, {}, file_note, current_notebook):launch()
     return
   end
 

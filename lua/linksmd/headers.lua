@@ -101,13 +101,13 @@ end
 local DisplayHeaders = {}
 DisplayHeaders.__index = DisplayHeaders
 
-function DisplayHeaders:init(opts, root_dir, files, file)
+function DisplayHeaders:init(opts, root_dir, files, file, current_notebook)
   local data = {
     opts = opts,
     root_dir = root_dir,
     files = files,
     file = file,
-    file_current_notebook = true,
+    file_current_notebook = current_notebook,
   }
 
   if file == nil then
