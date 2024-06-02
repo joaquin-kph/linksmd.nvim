@@ -29,8 +29,30 @@ function DisplayNotebooks:launch()
     local title = notebook.title
     local path = notebook.path
 
-    return string.format('%s  %s %s', icon, title, path)
+    local list = ''
+
+    print(self.root_dir, path)
+    if self.root_dir == path then
+      list = string.format('%s  %s  %s %s', icon, self.opts.custom.icons.current_workspace, title, path)
+    else
+      list = string.format('%s  %s  %s %s', icon, ' ', title, path)
+    end
+
+    return list
   end, self.opts.notebooks)
+
+  table.insert(
+    results,
+    1,
+    string.format(
+      '%s  %s  %s %s',
+      self.opts.custom.icons.directory,
+      self.opts.custom.icons.current_workspace,
+      self.opts.custom.text.open_workspace,
+      self.root_dir
+    )
+  )
+  -- print(vim.inspect(results))
 
   local prompt = self.opts.custom.text.notebooks
 
@@ -56,11 +78,19 @@ function DisplayNotebooks:launch()
 
           local i = 1
           for s in selection[1]:gmatch('(.-)%s') do
-            if i == 3 then
-              notebook = s
-              break
-            end
+            print(s, i)
+            -- if i == 5 then
+            --   notebook = s
+            --   break
+            -- end
             i = i + 1
+          end
+
+          print('FiNAL', notebook)
+
+          if notebook == nil then
+            vim.notify('[linksmd] No load the notebook ;(', vim.log.levels.WARN, { render = 'minimal' })
+            return
           end
 
           self.root_dir = vim.tbl_filter(function(n)

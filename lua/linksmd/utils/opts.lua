@@ -34,8 +34,10 @@ return {
       change_searching = 'Nueva Busqueda',
       helper = 'Ayuda',
       notebooks = 'Cuadernos',
+      open_workspace = 'Original',
     },
     icons = {
+      current_workspace = '',
       directory = '',
       notes = '',
       books = '',
