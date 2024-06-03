@@ -4,9 +4,10 @@ local plenary_path = require('plenary.path')
 
 local M = {}
 
-local function clear_globals()
+local function clear_globals(open_workspace, root_dir)
   _G.linksmd = {
-    notebook = nil,
+    notebook = root_dir or nil,
+    open_workspace = open_workspace or vim.fn.getcwd(),
     buffer = {
       id = nil,
       cursor = nil,
@@ -57,20 +58,7 @@ M.display = function(resource, display_init, follow_dir)
   if _G.linksmd.notebook ~= nil then
     root_dir = _G.linksmd.notebook
   else
-    if #M.opts.notebooks > 0 then
-      if not plenary_path:new(M.opts.notebooks[1].path):exists() then
-        vim.notify(
-          string.format('[linksmd] No found the first notebook (%s)', M.opts.notebooks[1].path),
-          vim.log.levels.WARN,
-          { render = 'minimal' }
-        )
-        return
-      end
-
-      root_dir = M.opts.notebooks[1].path
-    else
-      root_dir = ufiles.get_root_dir()
-    end
+    root_dir = ufiles.get_root_dir()
   end
 
   if root_dir == nil then
@@ -78,9 +66,7 @@ M.display = function(resource, display_init, follow_dir)
     return
   end
 
-  clear_globals()
-
-  _G.linksmd.notebook = root_dir
+  clear_globals(_G.linksmd.open_workspace, root_dir)
 
   if follow_dir ~= nil then
     if not plenary_path:new(follow_dir):exists() then

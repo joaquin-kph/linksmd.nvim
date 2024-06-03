@@ -205,14 +205,14 @@ local replace_line = function(line, regex, replace, n_ocurrence)
   return line
 end
 
-M.apply_file = function(file)
-  if _G.linksmd.notebook ~= M.get_root_dir() then
-    file = string.gsub(file, '^' .. _G.linksmd.notebook .. '/', '')
+M.apply_file = function(file, root_dir)
+  if root_dir ~= vim.fn.getcwd() then
+    file = string.gsub(file, '^' .. root_dir .. '/', '')
 
     if file:find('^#') then
       file = file
     else
-      file = string.format('%s/%s', _G.linksmd.notebook, file)
+      file = string.format('%s/%s', root_dir, file)
     end
   end
 

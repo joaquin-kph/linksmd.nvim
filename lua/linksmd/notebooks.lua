@@ -5,6 +5,8 @@ local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local dropdown = require('telescope.themes').get_dropdown()
 local plenary_path = require('plenary.path')
+local components = require('linksmd.utils.components')
+local event = require('nui.utils.autocmd').event
 
 local DisplayNotebooks = {}
 DisplayNotebooks.__index = DisplayNotebooks
@@ -25,34 +27,37 @@ function DisplayNotebooks:launch()
   local opts = dropdown
 
   local results = vim.tbl_map(function(notebook)
-    local icon = notebook.icon
     local title = notebook.title
     local path = notebook.path
 
     local list = ''
 
-    print(self.root_dir, path)
     if self.root_dir == path then
-      list = string.format('%s  %s  %s %s', icon, self.opts.custom.icons.current_workspace, title, path)
+      list = string.format('%s  %s  %s %s', self.opts.custom.icons.notebook, '', title, path)
     else
-      list = string.format('%s  %s  %s %s', icon, ' ', title, path)
+      list = string.format('%s  %s  %s %s', self.opts.custom.icons.notebook, '', title, path)
     end
 
     return list
   end, self.opts.notebooks)
+
+  local icon = ''
+
+  if self.root_dir == _G.linksmd.open_workspace then
+    icon = ''
+  end
 
   table.insert(
     results,
     1,
     string.format(
       '%s  %s  %s %s',
-      self.opts.custom.icons.directory,
-      self.opts.custom.icons.current_workspace,
+      self.opts.custom.icons.workspace,
+      icon,
       self.opts.custom.text.open_workspace,
-      self.root_dir
+      _G.linksmd.open_workspace
     )
   )
-  -- print(vim.inspect(results))
 
   local prompt = self.opts.custom.text.notebooks
 
@@ -78,28 +83,31 @@ function DisplayNotebooks:launch()
 
           local i = 1
           for s in selection[1]:gmatch('(.-)%s') do
-            print(s, i)
-            -- if i == 5 then
-            --   notebook = s
-            --   break
-            -- end
+            if i == 5 then
+              notebook = s
+              break
+            end
             i = i + 1
           end
-
-          print('FiNAL', notebook)
 
           if notebook == nil then
             vim.notify('[linksmd] No load the notebook ;(', vim.log.levels.WARN, { render = 'minimal' })
             return
           end
 
-          self.root_dir = vim.tbl_filter(function(n)
-            if n.title == notebook then
-              return true
-            end
+          local old_root_dir = self.root_dir
 
-            return false
-          end, self.opts.notebooks)[1].path
+          if notebook == self.opts.custom.text.open_workspace then
+            self.root_dir = _G.linksmd.open_workspace
+          else
+            self.root_dir = vim.tbl_filter(function(n)
+              if n.title == notebook then
+                return true
+              end
+
+              return false
+            end, self.opts.notebooks)[1].path
+          end
 
           _G.linksmd.notebook = self.root_dir
 
@@ -114,11 +122,36 @@ function DisplayNotebooks:launch()
 
           self.opts.resource = 'notes'
 
-          if self.opts.display_init == 'nui' then
-            require('linksmd.manager'):init(self.opts, self.root_dir, nil, {}):launch()
-          elseif self.opts.display_init == 'telescope' then
-            require('linksmd.finder'):init(self.opts, self.root_dir, {}, false):launch()
-          end
+          local Menu = components.menu(
+            self.opts.custom.text.change_workspace,
+            string.format('%s 󰜴 %s', old_root_dir, self.root_dir),
+            { width = '90%', height = '10%' },
+            { self.opts.custom.text.change_workspace_true, self.opts.custom.text.change_workspace_false },
+            function(value)
+              local item = value.text
+
+              if self.opts.custom.text.change_workspace_true == item then
+                vim.notify(
+                  string.format('[linksmd] Changing the workspace to %s', self.root_dir),
+                  vim.log.levels.INFO,
+                  { minimal = true }
+                )
+                vim.fn.chdir(self.root_dir)
+              end
+            end
+          )
+
+          Menu:mount()
+
+          Menu:on(event.BufLeave, function()
+            if self.opts.display_init == 'nui' then
+              require('linksmd.manager'):init(self.opts, self.root_dir, nil, {}):launch()
+            elseif self.opts.display_init == 'telescope' then
+              require('linksmd.finder'):init(self.opts, self.root_dir, {}, false):launch()
+            end
+
+            Menu:unmount()
+          end)
         end)
 
         map({ 'n', 'i' }, self.opts.keymaps.change_notebooks, function() end)

@@ -3,22 +3,18 @@ return {
     {
       path = vim.fn.expand('~') .. '/documentos/notas/personal',
       title = 'Principal',
-      icon = '',
     },
     {
       path = vim.fn.expand('~') .. '/test/vault',
       title = 'Secundario',
-      icon = '',
     },
     {
       path = vim.fn.expand('~') .. '/test/vault2',
       title = 'Terciario',
-      icon = '',
     },
     {
       path = vim.fn.expand('~') .. '/test',
       title = 'Test',
-      icon = '',
     },
   },
   resource = 'notes',
@@ -35,9 +31,13 @@ return {
       helper = 'Ayuda',
       notebooks = 'Cuadernos',
       open_workspace = 'Original',
+      change_workspace = 'Workspace',
+      change_workspace_true = 'Cambiar mi workspace',
+      change_workspace_false = 'Mantener mi actual workspace',
     },
     icons = {
-      current_workspace = '',
+      workspace = '',
+      notebook = '',
       directory = '',
       notes = '',
       books = '',

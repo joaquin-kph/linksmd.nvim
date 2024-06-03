@@ -75,7 +75,7 @@ local function launch_picker(display, opts, prompt, results)
           local header = '#'
             .. selection[1]:lower():gsub('[^%a%s%d%-_]', ''):gsub('^ *', ''):gsub(' ', '-'):gsub('%-%-', '-')
 
-          ufiles.apply_file(header)
+          ufiles.apply_file(header, display.root_dir)
         end)
 
         map('i', display.opts.keymaps.change_searching, function()

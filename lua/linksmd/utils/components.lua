@@ -26,14 +26,29 @@ M.popup = function(enter, focusable, title, buf_options)
   })
 end
 
-M.menu = function(title, items, bufnr_preview, root_dir)
-  local lines = {}
+M.menu = function(title, separator, size, items, on_submit)
+  local lines = vim.tbl_map(function(item)
+    return Menu.item(item)
+  end, items)
 
-  for _, v in ipairs(items) do
-    table.insert(lines, Menu.item(v))
-  end
+  table.insert(
+    lines,
+    1,
+    Menu.separator(separator, {
+      text_align = 'left',
+      char = '-',
+    })
+  )
 
   return Menu({
+    position = '50%',
+    size = {
+      width = size.width,
+      height = size.height,
+    },
+    win_options = {
+      winhighlight = 'Normal:Normal',
+    },
     border = {
       style = 'single',
       text = {
@@ -41,43 +56,15 @@ M.menu = function(title, items, bufnr_preview, root_dir)
         top_align = 'center',
       },
     },
-    position = {
-      row = 1,
-      col = 0,
-    },
-    win_options = {
-      winhighlight = 'Normal:Normal',
-    },
   }, {
     lines = lines,
-    -- max_width = 20,
     keymap = {
       focus_next = { 'j', '<down>', '<tab>', '<M-j>' },
       focus_prev = { 'k', '<up>', '<s-tab>', '<M-k>' },
       close = { '<esc>', '<M-q>', 'q' },
       submit = { '<cr>', '<space>' },
     },
-    on_change = function(item, _)
-      local path = string.format('%s/%s', root_dir, item.text)
-
-      plenary_async.run(function()
-        local data = ufiles.read_file(path)
-        local text = vim.split(data and data or '', '\n')
-
-        vim.schedule(function()
-          vim.api.nvim_buf_set_lines(bufnr_preview, 0, -1, false, text)
-
-          vim.api.nvim_buf_call(bufnr_preview, function()
-            if vim.api.nvim_buf_line_count(bufnr_preview) > 5 then
-              vim.api.nvim_win_set_cursor(0, { 5, 0 })
-            end
-          end)
-        end)
-      end)
-    end,
-    on_submit = function(item)
-      print(item.text)
-    end,
+    on_submit = on_submit,
   })
 end
 
