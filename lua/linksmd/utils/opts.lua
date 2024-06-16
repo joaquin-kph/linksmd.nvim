@@ -36,8 +36,8 @@ return {
       change_workspace_false = 'Mantener mi actual workspace',
     },
     icons = {
-      workspace = '',
-      notebook = '',
+      notebook = '',
+      workspace = '',
       directory = '',
       notes = '',
       books = '',

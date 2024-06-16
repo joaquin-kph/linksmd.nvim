@@ -26,25 +26,42 @@ end
 function DisplayNotebooks:launch()
   local opts = dropdown
 
+  local mkdnflow_ok, mkdnflow = pcall(require, 'mkdnflow')
+
   local results = vim.tbl_map(function(notebook)
     local title = notebook.title
     local path = notebook.path
 
     local list = ''
 
+    local icon_workspace = self.opts.custom.icons.notebook
+
+    if mkdnflow then
+      if mkdnflow.root_dir == path then
+        icon_workspace = self.opts.custom.icons.workspace
+      end
+    end
+
     if self.root_dir == path then
-      list = string.format('%s  %s  %s %s', self.opts.custom.icons.notebook, '', title, path)
+      list = string.format('%s  %s  %s %s', icon_workspace, '', title, path)
     else
-      list = string.format('%s  %s  %s %s', self.opts.custom.icons.notebook, '', title, path)
+      list = string.format('%s  %s  %s %s', icon_workspace, '', title, path)
     end
 
     return list
   end, self.opts.notebooks)
 
   local icon = ''
+  local icon_workspace = self.opts.custom.icons.notebook
 
   if self.root_dir == _G.linksmd.open_workspace then
     icon = ''
+  end
+
+  if mkdnflow then
+    if mkdnflow.root_dir == _G.linksmd.open_workspace then
+      icon_workspace = self.opts.custom.icons.workspace
+    end
   end
 
   table.insert(
@@ -52,7 +69,7 @@ function DisplayNotebooks:launch()
     1,
     string.format(
       '%s  %s  %s %s',
-      self.opts.custom.icons.workspace,
+      icon_workspace,
       icon,
       self.opts.custom.text.open_workspace,
       _G.linksmd.open_workspace
@@ -137,6 +154,12 @@ function DisplayNotebooks:launch()
                   { minimal = true }
                 )
                 vim.fn.chdir(self.root_dir)
+
+                local mkdnflow_ok, mkdnflow = pcall(require, 'mkdnflow')
+
+                if mkdnflow_ok then
+                  mkdnflow.root_dir = self.root_dir
+                end
               end
             end
           )
