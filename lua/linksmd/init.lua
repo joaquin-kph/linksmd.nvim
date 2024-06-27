@@ -41,14 +41,18 @@ M.setup = function(opts)
 end
 
 M.display = function(resource, display_init, follow_dir)
-  vim.cmd('messages clear')
+  -- vim.cmd('messages clear')
 
   if _G.linksmd.nui.tree.winid then
     vim.notify('[linksmd] You have an active operation', vim.log.levels.WARN, { render = 'minimal' })
     return
   end
 
-  if display_init ~= nil and display_init ~= '' and (display_init == 'telescope' or display_init == 'nui') then
+  if
+    display_init ~= nil
+    and display_init ~= ''
+    and (display_init == 'telescope' or display_init == 'nui' or display_init == 'notebooks')
+  then
     M.opts.display_init = display_init
   end
 
@@ -180,12 +184,11 @@ M.display = function(resource, display_init, follow_dir)
     require('linksmd.manager'):init(M.opts, root_dir, follow_dir, {}):launch()
   elseif M.opts.display_init == 'telescope' then
     require('linksmd.finder'):init(M.opts, root_dir, {}, false):launch()
+  elseif M.opts.display_init == 'notebooks' then
+    require('linksmd.notebooks'):init(M.opts, root_dir, {}):launch()
   else
     vim.notify('[linksmd] You need to configure the display_init', vim.log.levels.WARN, { render = 'minimal' })
   end
 end
--- vim.cmd('message clear')
--- M.setup()
--- M.display(nil, 'nui')
 
 return M

@@ -142,7 +142,7 @@ function DisplayNotebooks:launch()
           local Menu = components.menu(
             self.opts.custom.text.change_workspace,
             string.format('%s 󰜴 %s', old_root_dir, self.root_dir),
-            { width = '90%', height = '10%' },
+            { width = '70%', height = '10%' },
             { self.opts.custom.text.change_workspace_true, self.opts.custom.text.change_workspace_false },
             function(value)
               local item = value.text

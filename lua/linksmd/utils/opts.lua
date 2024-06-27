@@ -1,21 +1,21 @@
 return {
   notebooks = {
-    {
-      path = vim.fn.expand('~') .. '/documentos/notas/personal',
-      title = 'Principal',
-    },
-    {
-      path = vim.fn.expand('~') .. '/test/vault',
-      title = 'Secundario',
-    },
-    {
-      path = vim.fn.expand('~') .. '/test/vault2',
-      title = 'Terciario',
-    },
-    {
-      path = vim.fn.expand('~') .. '/test',
-      title = 'Test',
-    },
+    -- {
+    --   path = vim.fn.expand('~') .. '/documentos/notas/personal',
+    --   title = 'Principal',
+    -- },
+    -- {
+    --   path = vim.fn.expand('~') .. '/test/vault',
+    --   title = 'Secundario',
+    -- },
+    -- {
+    --   path = vim.fn.expand('~') .. '/test/vault2',
+    --   title = 'Terciario',
+    -- },
+    -- {
+    --   path = vim.fn.expand('~') .. '/test',
+    --   title = 'Test',
+    -- },
   },
   resource = 'notes',
   display_init = 'nui',
@@ -48,26 +48,26 @@ return {
     },
   },
   dir_resources = {
-    books = '/books',
-    images = '/images',
+    -- books = '/books',
+    -- images = '/images',
     -- videos = '/videos',
     -- sounds = '/sounds',
   },
   resources = {
     notes = { 'md', 'rmd' },
-    books = { 'pdf' },
-    images = { 'png', 'jpg', 'jpeg' },
-    sounds = { 'mp3' },
-    videos = { 'mp4' },
-    headers = {}, -- No renombrar para no causar posibles conflictos
+    -- books = { 'pdf' },
+    -- images = { 'png', 'jpg', 'jpeg' },
+    -- sounds = { 'mp3' },
+    -- videos = { 'mp4' },
+    -- headers = {}, -- No renombrar para no causar posibles conflictos
   },
   flags = {
     notes = 'note',
-    books = 'book',
-    images = 'img',
-    sounds = 'sound',
-    videos = 'video',
-    headers = '', -- No renombrar para no causar posibles conflictos
+    -- books = 'book',
+    -- images = 'img',
+    -- sounds = 'sound',
+    -- videos = 'video',
+    -- headers = '', -- No renombrar para no causar posibles conflictos
   },
   keymaps = {
     menu_enter = { '<cr>', '<tab>' },
