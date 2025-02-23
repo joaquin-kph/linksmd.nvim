@@ -25,7 +25,13 @@ M.get_files = function(root_dir, extensions, dir_resource)
   local dir_files = root_dir
 
   if dir_resource ~= nil then
-    dir_files = dir_files .. dir_resource
+    local resource_relative = dir_resource:match('^' .. vim.fn.expand('~')) == nil
+
+    if resource_relative then
+      dir_files = dir_files .. dir_resource
+    else
+      dir_files = dir_resource
+    end
   end
 
   local scandir = plenary_scandir(dir_files, { hidden = false })

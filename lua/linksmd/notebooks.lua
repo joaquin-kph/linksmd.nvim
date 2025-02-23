@@ -26,7 +26,7 @@ end
 function DisplayNotebooks:launch()
   local opts = dropdown
 
-  local mkdnflow_ok, mkdnflow = pcall(require, 'mkdnflow')
+  local _, mkdnflow = pcall(require, 'mkdnflow')
 
   local results = vim.tbl_map(function(notebook)
     local title = notebook.title

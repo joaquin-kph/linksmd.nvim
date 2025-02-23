@@ -32,7 +32,11 @@ function DisplaySearch:launch()
       local dir = self.opts.dir_resources[key]
 
       if dir ~= nil then
-        return string.format('%s  %s [#%s] %s%s', icon, key, self.opts.flags[key], self.root_dir, dir)
+        if dir:match('^' .. vim.fn.expand('~')) == nil then
+          dir = self.root_dir .. dir
+        end
+
+        return string.format('%s  %s [#%s] %s', icon, key, self.opts.flags[key], dir)
       else
         return string.format('%s  %s [#%s]', icon, key, self.opts.flags[key])
       end

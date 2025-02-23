@@ -39,6 +39,22 @@ function DisplayNui:init(opts, root_dir, follow_dir, files)
     end
 
     local dir_resource = data.opts.dir_resources[data.opts.resource] and data.opts.dir_resources[data.opts.resource]
+      or ''
+
+    if dir_resource:match('^' .. vim.fn.expand('~')) ~= nil then
+      data.follow_dir = dir_resource
+    else
+      local valid_resources = {
+        books = 1,
+        images = 2,
+        sounds = 3,
+        videos = 4,
+      }
+
+      if valid_resources[data.opts.resource] then
+        data.follow_dir = string.gsub(dir_resource, '^/', '')
+      end
+    end
 
     data.files = ufiles.get_files(data.root_dir, data.opts.resources[data.opts.resource], dir_resource)
   else

@@ -21,6 +21,10 @@ M.enter = function(display, tree, popup_tree, popup_preview)
       tree:render()
 
       if not node.children[1].children then
+        if display.opts.resource ~= 'notes' then
+          return
+        end
+
         unode.preview_data(display.root_dir, node.children[1].file, true, function(text)
           vim.api.nvim_buf_set_lines(popup_preview.bufnr, 0, -1, false, text)
 
