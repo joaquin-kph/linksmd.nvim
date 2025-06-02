@@ -7,6 +7,13 @@ local unode = require('linksmd.utils.node')
 
 local M = {}
 
+M.close = function(display, popup_tree, popup_preview)
+  popup_tree:map('n', display.opts.keymaps.close, function()
+    popup_tree:unmount()
+    popup_preview:unmount()
+  end)
+end
+
 M.enter = function(display, tree, popup_tree, popup_preview)
   popup_tree:map('n', display.opts.keymaps.menu_enter, function()
     ---@diagnostic disable-next-line: redefined-local

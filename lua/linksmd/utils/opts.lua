@@ -52,5 +52,6 @@ return {
     switch_manager = '<M-a>',
     helper = '?',
     helper_quit = { '<esc>', '<M-q>' },
+    close = { '<esc>', '<M-q>' },
   },
 }

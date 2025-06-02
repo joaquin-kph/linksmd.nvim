@@ -150,6 +150,7 @@ function DisplayNui:launch()
 
   vim.api.nvim_command('stopinsert')
 
+  mappings.close(self, popup_tree, popup_preview)
   mappings.enter(self, menu_tree, popup_tree, popup_preview)
   mappings.back(self, menu_tree, popup_tree, popup_preview)
   mappings.menu_up(self, menu_tree, popup_tree, popup_preview)
